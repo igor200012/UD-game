@@ -45,6 +45,7 @@
         .profile-box input{width:100%;padding:12px;background:#02010a;border:1px solid var(--gold);border-radius:14px;color:var(--gold);font-weight:700;text-align:center;font-size:1.1rem;outline:none;margin:8px 0}
         .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#0d0720;border:1px solid var(--gold);padding:12px 24px;border-radius:25px;font-weight:700;z-index:999;box-shadow:0 0 25px rgba(240,192,64,0.5);animation:toastAnim 2.5s ease forwards;pointer-events:none}
         @keyframes toastAnim{0%{opacity:0;top:0}15%{opacity:1;top:20px}80%{opacity:1;top:20px}100%{opacity:0;top:0}}
+        .star-slot{font-size:1.8rem;color:var(--gold);text-shadow:0 0 10px var(--gold)}
     </style>
 </head>
 <body>
@@ -96,333 +97,232 @@
     <div class="modal-overlay" id="giftActionModal"><div class="modal-box" id="giftActionModalBox"></div></div>
     <div class="fullscreen-game" id="fullGame"><div class="game-header"><h3 id="gameTitle"></h3><button class="exit-btn" onclick="closeGame()">ВЫЙТИ</button></div><div class="game-area" id="gameArea"></div></div>
 
-<script>
-    let balance = 1000;
-    let myGifts = [];
-    let profile = null;
-    let currentGame = null;
-    const save = localStorage.getItem('sg_v23');
-    if (save) { try { const s = JSON.parse(save); balance = s.balance || 1000; myGifts = s.gifts || []; profile = s.profile || null; } catch (e) {} }
-    function saveState() { localStorage.setItem('sg_v23', JSON.stringify({ balance, gifts: myGifts, profile })); }
-    function updateBalance() { document.getElementById('balanceDisplay').textContent = balance.toLocaleString('ru-RU'); }
-    function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
-    function navigate(tab) {
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        const btns = document.querySelectorAll('.nav-btn');
-        if (tab === 'games') { btns[0].classList.add('active'); document.getElementById('page-games').classList.add('active'); }
-        else if (tab === 'gifts') { btns[1].classList.add('active'); document.getElementById('page-gifts').classList.add('active'); renderMyGifts(); }
-        else if (tab === 'deposit') { btns[2].classList.add('active'); document.getElementById('page-deposit').classList.add('active'); }
-        else { btns[3].classList.add('active'); document.getElementById('page-profile').classList.add('active'); renderProfile(); }
-    }
-    function addWin(amount) { balance += amount; updateBalance(); saveState(); }
-    function placeBet(amount) { if (amount > balance) { toast('Недостаточно звёзд!'); return false; } balance -= amount; updateBalance(); saveState(); return true; }
-    function closeGame() { document.getElementById('fullGame').classList.remove('active'); currentGame = null; }
-    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-    function renderProfile() {
-        if (profile) {
-            document.getElementById('profileBox').style.display = 'none';
-            document.getElementById('profileInfo').style.display = 'block';
-            document.getElementById('profileName').textContent = '@' + profile.username;
-            document.getElementById('profileBalance').textContent = balance.toLocaleString('ru-RU');
-            document.getElementById('profileGifts').textContent = myGifts.length;
-        } else {
-            document.getElementById('profileBox').style.display = 'block';
-            document.getElementById('profileInfo').style.display = 'none';
+    <script>
+        let balance = 1000;
+        let myGifts = [];
+        let profile = null;
+        let currentGame = null;
+        const save = localStorage.getItem('sg_v24');
+        if (save) { try { const s = JSON.parse(save); balance = s.balance || 1000; myGifts = s.gifts || []; profile = s.profile || null; } catch (e) {} }
+        function saveState() { localStorage.setItem('sg_v24', JSON.stringify({ balance, gifts: myGifts, profile })); }
+        function updateBalance() { document.getElementById('balanceDisplay').textContent = balance.toLocaleString('ru-RU'); }
+        function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+        function navigate(tab) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const btns = document.querySelectorAll('.nav-btn');
+            if (tab === 'games') { btns[0].classList.add('active'); document.getElementById('page-games').classList.add('active'); }
+            else if (tab === 'gifts') { btns[1].classList.add('active'); document.getElementById('page-gifts').classList.add('active'); renderMyGifts(); }
+            else if (tab === 'deposit') { btns[2].classList.add('active'); document.getElementById('page-deposit').classList.add('active'); }
+            else { btns[3].classList.add('active'); document.getElementById('page-profile').classList.add('active'); renderProfile(); }
         }
-    }
-    function registerProfile() {
-        const username = document.getElementById('profileUsername').value.trim();
-        if (!username) { toast('Введите username'); return; }
-        if (!/^[a-zA-Z][a-zA-Z0-9_]{3,31}$/.test(username)) { toast('Только латиница, от 4 символов'); return; }
-        profile = { username, registeredAt: Date.now() };
-        saveState();
-        renderProfile();
-        toast('Профиль создан: @' + username);
-    }
+        function addWin(amount) { balance += amount; updateBalance(); saveState(); }
+        function placeBet(amount) { if (amount > balance) { toast('Недостаточно звёзд!'); return false; } balance -= amount; updateBalance(); saveState(); return true; }
+        function closeGame() { document.getElementById('fullGame').classList.remove('active'); currentGame = null; }
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-    function renderMyGifts() {
-        const grid = document.getElementById('myGifts');
-        const no = document.getElementById('noGifts');
-        if (myGifts.length === 0) { grid.innerHTML = ''; no.style.display = 'block'; return; }
-        no.style.display = 'none';
-        const icons = { bear: 'fa-paw', rose: 'fa-heart', gift: 'fa-gift', heart: 'fa-heart', cake: 'fa-cake', rocket: 'fa-rocket', bouquet: 'fa-leaf' };
-        const names = { bear: 'Мишка', rose: 'Роза', gift: 'Подарок', heart: 'Сердце', cake: 'Торт', rocket: 'Ракета', bouquet: 'Букет' };
-        const cols = { bear: '#8B4513', rose: '#e91e63', gift: '#f0c040', heart: '#e74c3c', cake: '#ff69b4', rocket: '#3498db', bouquet: '#2ecc71' };
-        grid.innerHTML = myGifts.map((g, i) => `
-            <div class="gift-card" onclick="openGiftActions(${i})">
-                <i class="fas ${icons[g]||'fa-gift'}" style="color:${cols[g]||'#fff'}"></i>
-                <div class="gname">${names[g]||g}</div>
-            </div>`).join('');
-    }
-
-    function openGiftActions(i) {
-        const g = myGifts[i];
-        const names = { bear: 'Мишка', rose: 'Роза', gift: 'Подарок', heart: 'Сердце', cake: 'Торт', rocket: 'Ракета', bouquet: 'Букет' };
-        const prices = { bear: 15, rose: 25, gift: 25, heart: 15, cake: 50, rocket: 50, bouquet: 50 };
-        const icons = { bear: 'fa-paw', rose: 'fa-heart', gift: 'fa-gift', heart: 'fa-heart', cake: 'fa-cake', rocket: 'fa-rocket', bouquet: 'fa-leaf' };
-        const cols = { bear: '#8B4513', rose: '#e91e63', gift: '#f0c040', heart: '#e74c3c', cake: '#ff69b4', rocket: '#3498db', bouquet: '#2ecc71' };
-        const modal = document.getElementById('giftActionModal');
-        const box = document.getElementById('giftActionModalBox');
-        modal.classList.add('open');
-        box.innerHTML = `
-            <h3>${names[g]}</h3>
-            <i class="fas ${icons[g]}" style="font-size:3rem;color:${cols[g]};margin:10px 0;"></i>
-            <p style="color:var(--gold);font-size:1.1rem;">Цена: ${prices[g]} STARS</p>
-            <button class="btn btn-play" onclick="sellGiftFromModal(${i})">ПРОДАТЬ</button>
-            <button class="btn btn-play" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;" onclick="withdrawGiftFromModal(${i})">ВЫВЕСТИ</button>
-            <button class="btn btn-close" onclick="closeModal('giftActionModal')">ОТМЕНА</button>`;
-        window._giftIdx = i;
-    }
-
-    function sellGiftFromModal(i) {
-        const prices = { bear: 15, rose: 25, gift: 25, heart: 15, cake: 50, rocket: 50, bouquet: 50 };
-        const g = myGifts[i];
-        balance += prices[g] || 0;
-        myGifts.splice(i, 1);
-        updateBalance(); saveState(); renderMyGifts(); closeModal('giftActionModal');
-        toast('Подарок продан за ' + (prices[g] || 0) + ' STARS!');
-    }
-
-    function withdrawGiftFromModal(i) {
-        const g = myGifts[i];
-        const names = { bear: 'Мишка', rose: 'Роза', gift: 'Подарок', heart: 'Сердце', cake: 'Торт', rocket: 'Ракета', bouquet: 'Букет' };
-        const box = document.getElementById('giftActionModalBox');
-        box.innerHTML = `
-            <h3>ВЫВОД: ${names[g]}</h3>
-            <p style="color:#e91e63;font-size:0.9rem;">Укажите ваш @username:</p>
-            <input type="text" id="withdrawGiftUser" value="" placeholder="username" oninput="validateUsername(this)">
-            <button class="btn btn-play" onclick="confirmWithdrawGiftFromModal(${i})">ВЫВЕСТИ</button>
-            <button class="btn btn-close" onclick="closeModal('giftActionModal')">ОТМЕНА</button>`;
-    }
-
-    function confirmWithdrawGiftFromModal(i) {
-        const raw = document.getElementById('withdrawGiftUser').value.trim();
-        const user = raw.replace(/@/g, '');
-        if (!user) { toast('Введите @username'); return; }
-        if (!/^[a-zA-Z][a-zA-Z0-9_]{3,31}$/.test(user)) { toast('Некорректный username'); return; }
-        const g = myGifts[i];
-        const names = { bear: 'Мишка', rose: 'Роза', gift: 'Подарок', heart: 'Сердце', cake: 'Торт', rocket: 'Ракета', bouquet: 'Букет' };
-        myGifts.splice(i, 1);
-        saveState(); renderMyGifts(); closeModal('giftActionModal');
-        toast('Заявка на вывод подарка "' + names[g] + '" для @' + user + ' принята!');
-    }
-
-    function validateUsername(input) { let val = input.value; val = val.replace(/@/g, ''); const valid = val.replace(/[^a-zA-Z0-9_]/g, ''); if (valid !== val && val.length > 0) { toast('Только латинские буквы, цифры и _'); } input.value = '@' + valid; }
-
-    function openDeposit(method) {
-        const modal = document.getElementById('depositModal'); const box = document.getElementById('depositModalBox');
-        modal.classList.add('open');
-        if (method === 'gift') {
-            box.innerHTML = '<h3>ВЫБЕРИ ПОДАРОК</h3><div class="gift-grid">' +
-                '<div class="gift-option selected" onclick="selGift(this,50)"><div class="gicon"><i class="fas fa-heart"></i></div><div class="gname">Роза</div><div class="gprice">50 STARS</div></div>' +
-                '<div class="gift-option" onclick="selGift(this,100)"><div class="gicon"><i class="fas fa-star"></i></div><div class="gname">Звезда</div><div class="gprice">100 STARS</div></div>' +
-                '<div class="gift-option" onclick="selGift(this,200)"><div class="gicon"><i class="fas fa-gem"></i></div><div class="gname">Бриллиант</div><div class="gprice">200 STARS</div></div>' +
-                '<div class="gift-option" onclick="selGift(this,500)"><div class="gicon"><i class="fas fa-crown"></i></div><div class="gname">Корона</div><div class="gprice">500 STARS</div></div>' +
-                '<div class="gift-option" onclick="selGift(this,1000)"><div class="gicon"><i class="fas fa-trophy"></i></div><div class="gname">Премиум</div><div class="gprice">1000 STARS</div></div>' +
-                '<div class="gift-option" onclick="selGift(this,2500)"><div class="gicon"><i class="fas fa-bolt"></i></div><div class="gname">Коллекционный</div><div class="gprice">2500 STARS</div></div>' +
-                '</div><button class="btn btn-play" onclick="confirmGiftDeposit()">ПЕРЕВЕСТИ ПОДАРОК</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>';
-            window._giftVal = 50;
-        } else {
-            const t = { stars: 'TELEGRAM STARS', crypto: 'КРИПТОВАЛЮТА', sbp: 'СБП / КАРТА' };
-            box.innerHTML = '<h3>' + t[method] + '</h3><input type="number" id="depAmt" value="500" min="15" max="16000"><p style="font-size:0.7rem;color:#888;">Мин: 15 | Макс: 16000</p><button class="btn btn-play" onclick="confirmDep(\'' + method + '\')">ПОПОЛНИТЬ</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>';
+        function renderProfile() {
+            if (profile) {
+                document.getElementById('profileBox').style.display = 'none';
+                document.getElementById('profileInfo').style.display = 'block';
+                document.getElementById('profileName').textContent = '@' + profile.username;
+                document.getElementById('profileBalance').textContent = balance.toLocaleString('ru-RU');
+                document.getElementById('profileGifts').textContent = myGifts.length;
+            } else {
+                document.getElementById('profileBox').style.display = 'block';
+                document.getElementById('profileInfo').style.display = 'none';
+            }
         }
-    }
-    function selGift(el, val) { document.querySelectorAll('.gift-option').forEach(x => x.classList.remove('selected')); el.classList.add('selected'); window._giftVal = val; }
-    function confirmGiftDeposit() { const amt = window._giftVal; document.getElementById('depositModalBox').innerHTML = '<h3>ПЕРЕВЕДИТЕ ПОДАРОК</h3><p style="color:#e91e63;font-size:1rem;">Переведите подарок на @AdminStarGame</p><p style="color:#f0c040;font-size:1.3rem;font-weight:800;">Сумма: ' + amt + ' STARS</p><button class="btn btn-play" onclick="finalizeGift(' + amt + ')">ГОТОВО</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>'; }
-    function finalizeGift(amt) { toast('Подарок на ' + amt + ' STARS отправлен'); closeModal('depositModal'); }
-    function confirmDep(m) { const a = parseInt(document.getElementById('depAmt').value) || 0; if (a < 15) { toast('Минимум 15'); return; } if (a > 16000) { toast('Максимум 16000'); return; } toast('Заявка на ' + a + ' STARS принята!'); closeModal('depositModal'); }
-    function openWithdraw(method) {
-        const modal = document.getElementById('depositModal'); const box = document.getElementById('depositModalBox');
-        modal.classList.add('open');
-        if (method === 'gift') {
-            box.innerHTML = '<h3>ВЫБЕРИ ПОДАРОК ДЛЯ ВЫВОДА</h3><div class="gift-grid">' +
-                '<div class="gift-option selected" onclick="selWGift(this,50)"><div class="gicon"><i class="fas fa-heart"></i></div><div class="gname">Роза</div><div class="gprice">50 STARS</div></div>' +
-                '<div class="gift-option" onclick="selWGift(this,100)"><div class="gicon"><i class="fas fa-star"></i></div><div class="gname">Звезда</div><div class="gprice">100 STARS</div></div>' +
-                '<div class="gift-option" onclick="selWGift(this,200)"><div class="gicon"><i class="fas fa-gem"></i></div><div class="gname">Бриллиант</div><div class="gprice">200 STARS</div></div>' +
-                '<div class="gift-option" onclick="selWGift(this,500)"><div class="gicon"><i class="fas fa-crown"></i></div><div class="gname">Корона</div><div class="gprice">500 STARS</div></div>' +
-                '<div class="gift-option" onclick="selWGift(this,1000)"><div class="gicon"><i class="fas fa-trophy"></i></div><div class="gname">Премиум</div><div class="gprice">1000 STARS</div></div>' +
-                '</div><button class="btn btn-play" onclick="goToWithdrawUsername()">ДАЛЕЕ</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>';
-            window._wgiftVal = 50;
-        } else { box.innerHTML = '<h3>ВЫВОД ЗВЁЗДАМИ</h3><input type="text" id="withUser" value="" placeholder="username" oninput="validateUsername(this)"><button class="btn btn-play" onclick="confirmWithdrawStars()">ВЫВЕСТИ</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>'; }
-    }
-    function selWGift(el, val) { document.querySelectorAll('#depositModalBox .gift-option').forEach(x => x.classList.remove('selected')); el.classList.add('selected'); window._wgiftVal = val; }
-    function goToWithdrawUsername() { const box = document.getElementById('depositModalBox'); box.innerHTML = '<h3>ВЫВОД ПОДАРКОМ</h3><p style="color:#f0c040;">Выбран подарок на ' + window._wgiftVal + ' STARS</p><input type="text" id="withUser" value="" placeholder="username" oninput="validateUsername(this)"><button class="btn btn-play" onclick="confirmWithdrawGift()">ВЫВЕСТИ</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>'; }
-    function confirmWithdrawGift() { const raw = document.getElementById('withUser').value.trim(); const user = raw.replace(/@/g, ''); if (!user) { toast('Введите @username'); return; } if (!/^[a-zA-Z][a-zA-Z0-9_]{3,31}$/.test(user)) { toast('Некорректный username'); return; } balance -= window._wgiftVal; updateBalance(); saveState(); toast('Заявка на вывод для @' + user + ' принята!'); closeModal('depositModal'); }
-    function confirmWithdrawStars() { const raw = document.getElementById('withUser').value.trim(); const user = raw.replace(/@/g, ''); if (!user) { toast('Введите @username'); return; } if (!/^[a-zA-Z][a-zA-Z0-9_]{3,31}$/.test(user)) { toast('Некорректный username'); return; } const amt = Math.min(balance, 500); if (amt < 50) { toast('Минимум 50 STARS'); return; } balance -= amt; updateBalance(); saveState(); toast('Заявка на вывод для @' + user + ' принята!'); closeModal('depositModal'); }
+        function registerProfile() {
+            const username = document.getElementById('profileUsername').value.trim();
+            if (!username) { toast('Введите username'); return; }
+            if (!/^[a-zA-Z][a-zA-Z0-9_]{3,31}$/.test(username)) { toast('Только латиница, от 4 символов'); return; }
+            profile = { username, registeredAt: Date.now() };
+            saveState(); renderProfile(); toast('Профиль создан: @' + username);
+        }
 
-function openGame(game) {
-    currentGame = game;
-    document.getElementById('fullGame').classList.add('active');
-    document.getElementById('gameTitle').textContent = game === 'cases' ? 'КЕЙСЫ' : 'МИНЫ';
-    const a = document.getElementById('gameArea');
-    if (game === 'cases') buildCases(a);
-    if (game === 'mines') buildMines(a);
-}
+        function renderMyGifts() {
+            const grid = document.getElementById('myGifts'); const no = document.getElementById('noGifts');
+            if (myGifts.length === 0) { grid.innerHTML = ''; no.style.display = 'block'; return; }
+            no.style.display = 'none';
+            const icons = { bear: 'fa-paw', rose: 'fa-heart', gift: 'fa-gift', heart: 'fa-heart', cake: 'fa-cake', rocket: 'fa-rocket', bouquet: 'fa-leaf' };
+            const names = { bear: 'Мишка', rose: 'Роза', gift: 'Подарок', heart: 'Сердце', cake: 'Торт', rocket: 'Ракета', bouquet: 'Букет' };
+            const cols = { bear: '#8B4513', rose: '#e91e63', gift: '#f0c040', heart: '#e74c3c', cake: '#ff69b4', rocket: '#3498db', bouquet: '#2ecc71' };
+            grid.innerHTML = myGifts.map((g, i) => `
+                <div class="gift-card" onclick="openGiftActions(${i})">
+                    <i class="fas ${icons[g]||'fa-gift'}" style="color:${cols[g]||'#fff'}"></i>
+                    <div class="gname">${names[g]||g}</div>
+                </div>`).join('');
+        }
 
-// Подарки (редкие) — общий шанс ~35%
-const giftItems = [
-    { type: 'gift', id: 'bear', name: 'Мишка', icon: 'fa-paw', color: '#8B4513', chance: 5 },
-    { type: 'gift', id: 'rose', name: 'Роза', icon: 'fa-heart', color: '#e91e63', chance: 8 },
-    { type: 'gift', id: 'gift', name: 'Подарок', icon: 'fa-gift', color: '#f0c040', chance: 7 },
-    { type: 'gift', id: 'heart', name: 'Сердце', icon: 'fa-heart', color: '#e74c3c', chance: 5 },
-    { type: 'gift', id: 'cake', name: 'Торт', icon: 'fa-cake', color: '#ff69b4', chance: 3 },
-    { type: 'gift', id: 'rocket', name: 'Ракета', icon: 'fa-rocket', color: '#3498db', chance: 3 },
-    { type: 'gift', id: 'bouquet', name: 'Букет', icon: 'fa-leaf', color: '#2ecc71', chance: 4 }
-];
-// Звёзды (частые) — общий шанс ~65%, 20 слотов с повторами
-const starItems = [
-    { type: 'stars', amount: 5, chance: 30 },
-    { type: 'stars', amount: 10, chance: 22 },
-    { type: 'stars', amount: 15, chance: 13 }
-];
-// Все предметы для ленты
-const allCaseItems = [...giftItems, ...starItems];
-const totalChance = allCaseItems.reduce((s, i) => s + i.chance, 0);
+        function openGiftActions(i) {
+            const g = myGifts[i]; const names = { bear: 'Мишка', rose: 'Роза', gift: 'Подарок', heart: 'Сердце', cake: 'Торт', rocket: 'Ракета', bouquet: 'Букет' };
+            const prices = { bear: 15, rose: 25, gift: 25, heart: 15, cake: 50, rocket: 50, bouquet: 50 };
+            const icons = { bear: 'fa-paw', rose: 'fa-heart', gift: 'fa-gift', heart: 'fa-heart', cake: 'fa-cake', rocket: 'fa-rocket', bouquet: 'fa-leaf' };
+            const cols = { bear: '#8B4513', rose: '#e91e63', gift: '#f0c040', heart: '#e74c3c', cake: '#ff69b4', rocket: '#3498db', bouquet: '#2ecc71' };
+            const modal = document.getElementById('giftActionModal'); const box = document.getElementById('giftActionModalBox');
+            modal.classList.add('open');
+            box.innerHTML = `<h3>${names[g]}</h3><i class="fas ${icons[g]}" style="font-size:3rem;color:${cols[g]};margin:10px 0;"></i><p style="color:var(--gold);font-size:1.1rem;">Цена: ${prices[g]} STARS</p><button class="btn btn-play" onclick="sellGiftFromModal(${i})">ПРОДАТЬ</button><button class="btn btn-play" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;" onclick="withdrawGiftFromModal(${i})">ВЫВЕСТИ</button><button class="btn btn-close" onclick="closeModal('giftActionModal')">ОТМЕНА</button>`;
+            window._giftIdx = i;
+        }
+        function sellGiftFromModal(i) { const prices = { bear: 15, rose: 25, gift: 25, heart: 15, cake: 50, rocket: 50, bouquet: 50 }; const g = myGifts[i]; balance += prices[g] || 0; myGifts.splice(i, 1); updateBalance(); saveState(); renderMyGifts(); closeModal('giftActionModal'); toast('Подарок продан за ' + (prices[g] || 0) + ' STARS!'); }
+        function withdrawGiftFromModal(i) { const g = myGifts[i]; const names = { bear: 'Мишка', rose: 'Роза', gift: 'Подарок', heart: 'Сердце', cake: 'Торт', rocket: 'Ракета', bouquet: 'Букет' }; const box = document.getElementById('giftActionModalBox'); box.innerHTML = `<h3>ВЫВОД: ${names[g]}</h3><p style="color:#e91e63;font-size:0.9rem;">Укажите ваш @username:</p><input type="text" id="withdrawGiftUser" value="" placeholder="username" oninput="validateUsername(this)"><button class="btn btn-play" onclick="confirmWithdrawGiftFromModal(${i})">ВЫВЕСТИ</button><button class="btn btn-close" onclick="closeModal('giftActionModal')">ОТМЕНА</button>`; }
+        function confirmWithdrawGiftFromModal(i) { const raw = document.getElementById('withdrawGiftUser').value.trim(); const user = raw.replace(/@/g, ''); if (!user) { toast('Введите @username'); return; } if (!/^[a-zA-Z][a-zA-Z0-9_]{3,31}$/.test(user)) { toast('Некорректный username'); return; } const g = myGifts[i]; const names = { bear: 'Мишка', rose: 'Роза', gift: 'Подарок', heart: 'Сердце', cake: 'Торт', rocket: 'Ракета', bouquet: 'Букет' }; myGifts.splice(i, 1); saveState(); renderMyGifts(); closeModal('giftActionModal'); toast('Заявка на вывод подарка "' + names[g] + '" для @' + user + ' принята!'); }
+        function validateUsername(input) { let val = input.value; val = val.replace(/@/g, ''); const valid = val.replace(/[^a-zA-Z0-9_]/g, ''); if (valid !== val && val.length > 0) { toast('Только латинские буквы, цифры и _'); } input.value = '@' + valid; }
 
-function buildCases(a) {
-    // Создаём ленту: 10 подарков + 20 звёзд = 30 уникальных, ×3 = 90 слотов
-    const slotsList = [];
-    // Добавляем подарки (каждый по 1 разу)
-    giftItems.forEach(item => { for (let i = 0; i < 1; i++) slotsList.push(item); });
-    // Добавляем звёзды (с повторами чтобы заполнить 20 слотов)
-    const starSlots = [];
-    starItems.forEach(item => { for (let i = 0; i < 7; i++) starSlots.push(item); }); // 3×7=21
-    while (starSlots.length > 20) starSlots.pop();
-    starSlots.forEach(item => slotsList.push(item));
-    // Перемешиваем
-    for (let i = slotsList.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));
-        [slotsList[i], slotsList[j]] = [slotsList[j], slotsList[i]]; }
-    const totalSlots = slotsList.length * 3;
-    let slotsHTML = '';
-    for (let i = 0; i < totalSlots; i++) {
-        const item = slotsList[i % slotsList.length];
-        if (item.type === 'gift') { slotsHTML +=
-            `<div class="case-slot"><i class="fas ${item.icon}" style="color:${item.color};"></i></div>`; } else { slotsHTML +=
-            `<div class="case-slot"><span style="font-size:1rem;font-weight:700;color:var(--gold);">${item.amount}⭐</span></div>`; }
-    }
-    a.innerHTML = `
-        <p style="color:#aaa;">Крути кейс за 15 STARS. Стрелка показывает выигрыш.</p>
-        <div class="cases-container">
-            <div class="marker"></div>
-            <div class="cases-window">
-                <div class="cases-track" id="casesTrack">${slotsHTML}</div>
-            </div>
-        </div>
-        <div class="result-text" id="caseResult"></div>
-        <button class="btn btn-play" id="caseBtn" onclick="spinCase()">ОТКРЫТЬ КЕЙС (15 STARS)</button>`;
-    window._slotsList = slotsList;
-}
+        function openDeposit(method) {
+            const modal = document.getElementById('depositModal'); const box = document.getElementById('depositModalBox'); modal.classList.add('open');
+            if (method === 'gift') { box.innerHTML = '<h3>ВЫБЕРИ ПОДАРОК</h3><div class="gift-grid">' + '<div class="gift-option selected" onclick="selGift(this,50)"><div class="gicon"><i class="fas fa-heart"></i></div><div class="gname">Роза</div><div class="gprice">50 STARS</div></div>' + '<div class="gift-option" onclick="selGift(this,100)"><div class="gicon"><i class="fas fa-star"></i></div><div class="gname">Звезда</div><div class="gprice">100 STARS</div></div>' + '<div class="gift-option" onclick="selGift(this,200)"><div class="gicon"><i class="fas fa-gem"></i></div><div class="gname">Бриллиант</div><div class="gprice">200 STARS</div></div>' + '<div class="gift-option" onclick="selGift(this,500)"><div class="gicon"><i class="fas fa-crown"></i></div><div class="gname">Корона</div><div class="gprice">500 STARS</div></div>' + '<div class="gift-option" onclick="selGift(this,1000)"><div class="gicon"><i class="fas fa-trophy"></i></div><div class="gname">Премиум</div><div class="gprice">1000 STARS</div></div>' + '<div class="gift-option" onclick="selGift(this,2500)"><div class="gicon"><i class="fas fa-bolt"></i></div><div class="gname">Коллекционный</div><div class="gprice">2500 STARS</div></div>' + '</div><button class="btn btn-play" onclick="confirmGiftDeposit()">ПЕРЕВЕСТИ ПОДАРОК</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>'; window._giftVal = 50; } else { const t = { stars: 'TELEGRAM STARS', crypto: 'КРИПТОВАЛЮТА', sbp: 'СБП / КАРТА' }; box.innerHTML = '<h3>' + t[method] + '</h3><input type="number" id="depAmt" value="500" min="15" max="16000"><p style="font-size:0.7rem;color:#888;">Мин: 15 | Макс: 16000</p><button class="btn btn-play" onclick="confirmDep(\'' + method + '\')">ПОПОЛНИТЬ</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>'; }
+        }
+        function selGift(el, val) { document.querySelectorAll('.gift-option').forEach(x => x.classList.remove('selected')); el.classList.add('selected'); window._giftVal = val; }
+        function confirmGiftDeposit() { const amt = window._giftVal; document.getElementById('depositModalBox').innerHTML = '<h3>ПЕРЕВЕДИТЕ ПОДАРОК</h3><p style="color:#e91e63;font-size:1rem;">Переведите подарок на @AdminStarGame</p><p style="color:#f0c040;font-size:1.3rem;font-weight:800;">Сумма: ' + amt + ' STARS</p><button class="btn btn-play" onclick="finalizeGift(' + amt + ')">ГОТОВО</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>'; }
+        function finalizeGift(amt) { toast('Подарок на ' + amt + ' STARS отправлен'); closeModal('depositModal'); }
+        function confirmDep(m) { const a = parseInt(document.getElementById('depAmt').value) || 0; if (a < 15) { toast('Минимум 15'); return; } if (a > 16000) { toast('Максимум 16000'); return; } toast('Заявка на ' + a + ' STARS принята!'); closeModal('depositModal'); }
+        function openWithdraw(method) { const modal = document.getElementById('depositModal'); const box = document.getElementById('depositModalBox'); modal.classList.add('open'); if (method === 'gift') { box.innerHTML = '<h3>ВЫБЕРИ ПОДАРОК ДЛЯ ВЫВОДА</h3><div class="gift-grid">' + '<div class="gift-option selected" onclick="selWGift(this,50)"><div class="gicon"><i class="fas fa-heart"></i></div><div class="gname">Роза</div><div class="gprice">50 STARS</div></div>' + '<div class="gift-option" onclick="selWGift(this,100)"><div class="gicon"><i class="fas fa-star"></i></div><div class="gname">Звезда</div><div class="gprice">100 STARS</div></div>' + '<div class="gift-option" onclick="selWGift(this,200)"><div class="gicon"><i class="fas fa-gem"></i></div><div class="gname">Бриллиант</div><div class="gprice">200 STARS</div></div>' + '<div class="gift-option" onclick="selWGift(this,500)"><div class="gicon"><i class="fas fa-crown"></i></div><div class="gname">Корона</div><div class="gprice">500 STARS</div></div>' + '<div class="gift-option" onclick="selWGift(this,1000)"><div class="gicon"><i class="fas fa-trophy"></i></div><div class="gname">Премиум</div><div class="gprice">1000 STARS</div></div>' + '</div><button class="btn btn-play" onclick="goToWithdrawUsername()">ДАЛЕЕ</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>'; window._wgiftVal = 50; } else { box.innerHTML = '<h3>ВЫВОД ЗВЁЗДАМИ</h3><input type="text" id="withUser" value="" placeholder="username" oninput="validateUsername(this)"><button class="btn btn-play" onclick="confirmWithdrawStars()">ВЫВЕСТИ</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>'; } }
+        function selWGift(el, val) { document.querySelectorAll('#depositModalBox .gift-option').forEach(x => x.classList.remove('selected')); el.classList.add('selected'); window._wgiftVal = val; }
+        function goToWithdrawUsername() { const box = document.getElementById('depositModalBox'); box.innerHTML = '<h3>ВЫВОД ПОДАРКОМ</h3><p style="color:#f0c040;">Выбран подарок на ' + window._wgiftVal + ' STARS</p><input type="text" id="withUser" value="" placeholder="username" oninput="validateUsername(this)"><button class="btn btn-play" onclick="confirmWithdrawGift()">ВЫВЕСТИ</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>'; }
+        function confirmWithdrawGift() { const raw = document.getElementById('withUser').value.trim(); const user = raw.replace(/@/g, ''); if (!user) { toast('Введите @username'); return; } if (!/^[a-zA-Z][a-zA-Z0-9_]{3,31}$/.test(user)) { toast('Некорректный username'); return; } balance -= window._wgiftVal; updateBalance(); saveState(); toast('Заявка на вывод для @' + user + ' принята!'); closeModal('depositModal'); }
+        function confirmWithdrawStars() { const raw = document.getElementById('withUser').value.trim(); const user = raw.replace(/@/g, ''); if (!user) { toast('Введите @username'); return; } if (!/^[a-zA-Z][a-zA-Z0-9_]{3,31}$/.test(user)) { toast('Некорректный username'); return; } const amt = Math.min(balance, 500); if (amt < 50) { toast('Минимум 50 STARS'); return; } balance -= amt; updateBalance(); saveState(); toast('Заявка на вывод для @' + user + ' принята!'); closeModal('depositModal'); }
 
-function spinCase() {
-    if (balance < 15) { toast('Недостаточно звёзд! Нужно 15.'); return; }
-    balance -= 15;
-    updateBalance();
-    saveState();
-    const btn = document.getElementById('caseBtn');
-    btn.disabled = true;
-    btn.textContent = 'КРУТИМ...';
-    document.getElementById('caseResult').innerHTML = '';
+        function openGame(game) { currentGame = game; document.getElementById('fullGame').classList.add('active'); document.getElementById('gameTitle').textContent = game === 'cases' ? 'КЕЙСЫ' : 'МИНЫ'; const a = document.getElementById('gameArea'); if (game === 'cases') buildCases(a); if (game === 'mines') buildMines(a); }
 
-    const r = Math.random() * totalChance;
-    let cum = 0,
-        winner = allCaseItems[0];
-    for (const item of allCaseItems) { cum += item.chance; if (r <= cum) { winner = item; break; } }
+        const giftItems = [
+            { type: 'gift', id: 'bear', name: 'Мишка', icon: 'fa-paw', color: '#8B4513', chance: 5 },
+            { type: 'gift', id: 'rose', name: 'Роза', icon: 'fa-heart', color: '#e91e63', chance: 8 },
+            { type: 'gift', id: 'gift', name: 'Подарок', icon: 'fa-gift', color: '#f0c040', chance: 7 },
+            { type: 'gift', id: 'heart', name: 'Сердце', icon: 'fa-heart', color: '#e74c3c', chance: 5 },
+            { type: 'gift', id: 'cake', name: 'Торт', icon: 'fa-cake', color: '#ff69b4', chance: 3 },
+            { type: 'gift', id: 'rocket', name: 'Ракета', icon: 'fa-rocket', color: '#3498db', chance: 3 },
+            { type: 'gift', id: 'bouquet', name: 'Букет', icon: 'fa-leaf', color: '#2ecc71', chance: 4 }
+        ];
+        const starItems = [
+            { type: 'stars', amount: 5, chance: 30 },
+            { type: 'stars', amount: 10, chance: 22 },
+            { type: 'stars', amount: 15, chance: 13 }
+        ];
+        const allCaseItems = [...giftItems, ...starItems];
+        const totalChance = allCaseItems.reduce((s, i) => s + i.chance, 0);
 
-    const slotsList = window._slotsList;
-    // Находим индекс победителя в слотах (второй повтор)
-    let winnerIdx = 0;
-    for (let i = 0; i < slotsList.length; i++) {
-        if (slotsList[i].type === winner.type && (winner.type === 'stars' ? slotsList[i].amount === winner.amount :
-                slotsList[i].id === winner.id)) { winnerIdx = i; break; }
-    }
-    const targetSlotIndex = slotsList.length + winnerIdx;
-    const slotWidth = 102;
-    const track = document.getElementById('casesTrack');
-    const startPos = 0;
-    const targetPos = -(targetSlotIndex * slotWidth) + 120;
-    const duration = 5000;
-    const startTime = Date.now();
+        function buildCases(a) {
+            const slotsList = [];
+            giftItems.forEach(item => { slotsList.push(item); });
+            starItems.forEach(item => { for (let i = 0; i < 7; i++) slotsList.push(item); });
+            while (slotsList.filter(x => x.type === 'stars').length > 21) { const idx = slotsList.findIndex(x => x.type === 'stars'); if (idx >= 0) slotsList.splice(idx, 1); }
+            for (let i = slotsList.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));
+                [slotsList[i], slotsList[j]] = [slotsList[j], slotsList[i]]; }
+            const totalSlots = slotsList.length * 3;
+            let slotsHTML = '';
+            for (let i = 0; i < totalSlots; i++) {
+                const item = slotsList[i % slotsList.length];
+                if (item.type === 'gift') { slotsHTML +=
+                    `<div class="case-slot"><i class="fas ${item.icon}" style="color:${item.color};"></i></div>`; } else { slotsHTML +=
+                    `<div class="case-slot"><div class="star-slot"><i class="fas fa-star"></i> ${item.amount}</div></div>`; }
+            }
+            a.innerHTML = `
+                <p style="color:#aaa;">Крути кейс за 15 STARS. Что под стрелкой — то и получаешь.</p>
+                <div class="cases-container">
+                    <div class="marker"></div>
+                    <div class="cases-window">
+                        <div class="cases-track" id="casesTrack">${slotsHTML}</div>
+                    </div>
+                </div>
+                <div class="result-text" id="caseResult"></div>
+                <button class="btn btn-play" id="caseBtn" onclick="spinCase()">ОТКРЫТЬ КЕЙС (15 STARS)</button>`;
+            window._slotsList = slotsList;
+        }
 
-    function animate() {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(1, elapsed / duration);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        track.style.transform = 'translateX(' + (startPos + (targetPos - startPos) * eased) + 'px)';
-        if (progress < 1) requestAnimationFrame(animate);
-        else {
-            if (winner.type === 'gift') { myGifts.push(winner.id);
-                saveState();
-                document.getElementById('caseResult').innerHTML =
-                    `<span style="color:var(--gold);">${winner.name} отправлен в подарки!</span>`;
-                toast('Получен подарок: ' + winner.name + '!'); } else { addWin(winner
-                    .amount);
-                document.getElementById('caseResult').innerHTML =
-                    `<span style="color:var(--gold);">+${winner.amount} STARS!</span>`;
-                toast('Получено ' + winner.amount + ' STARS!'); }
-            btn.disabled = false;
-            btn.textContent = 'ОТКРЫТЬ КЕЙС (15 STARS)';
+        function spinCase() {
+            if (balance < 15) { toast('Недостаточно звёзд! Нужно 15.'); return; }
+            balance -= 15;
+            updateBalance();
+            saveState();
+            const btn = document.getElementById('caseBtn');
+            btn.disabled = true;
+            btn.textContent = 'КРУТИМ...';
+            document.getElementById('caseResult').innerHTML = '';
+
+            const slotsList = window._slotsList;
+            const r = Math.random() * totalChance;
+            let cum = 0,
+                winner = allCaseItems[0];
+            for (const item of allCaseItems) { cum += item.chance; if (r <= cum) { winner = item; break; } }
+            let winnerIdx = 0;
+            for (let i = 0; i < slotsList.length; i++) {
+                if (slotsList[i].type === winner.type && (winner.type === 'stars' ? slotsList[i].amount === winner.amount :
+                        slotsList[i].id === winner.id)) { winnerIdx = i; break; }
+            }
+            const targetSlotIndex = slotsList.length + winnerIdx;
+            const slotWidth = 102;
+            const track = document.getElementById('casesTrack');
+            const startPos = 0;
+            const targetPos = -(targetSlotIndex * slotWidth) + 120;
+            const duration = 5000;
+            const startTime = Date.now();
+
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(1, elapsed / duration);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                track.style.transform = 'translateX(' + (startPos + (targetPos - startPos) * eased) + 'px)';
+                if (progress < 1) requestAnimationFrame(animate);
+                else {
+                    if (winner.type === 'gift') { myGifts.push(winner.id);
+                        saveState();
+                        document.getElementById('caseResult').innerHTML =
+                            `<span style="color:var(--gold);">${winner.name} отправлен в подарки!</span>`;
+                        toast('Получен подарок: ' + winner.name + '!'); } else { addWin(winner
+                            .amount);
+                        document.getElementById('caseResult').innerHTML =
+                            `<span style="color:var(--gold);">+${winner.amount} STARS!</span>`;
+                        toast('Получено ' + winner.amount + ' STARS!'); }
+                    btn.disabled = false;
+                    btn.textContent = 'ОТКРЫТЬ КЕЙС (15 STARS)';
+                    track.style.transition = 'none';
+                    track.style.transform = 'translateX(0px)';
+                    setTimeout(() => { track.style.transition = ''; }, 50);
+                }
+            }
             track.style.transition = 'none';
             track.style.transform = 'translateX(0px)';
-            setTimeout(() => { track.style.transition = ''; }, 50);
+            setTimeout(() => { track.style.transition = 'transform 0.05s linear';
+                requestAnimationFrame(animate); }, 50);
         }
-    }
-    track.style.transition = 'none';
-    track.style.transform = 'translateX(0px)';
-    setTimeout(() => { track.style.transition = 'transform 0.05s linear';
-        requestAnimationFrame(animate); }, 50);
-}
 
         let mSt = { act: false, mult: 1, rev: 0, b: [], bet: 100, canCollect: false, bonus: 0 };
-        function buildMines(a) {
-            mSt = { act: true, mult: 1, rev: 0, b: [], bet: 100, canCollect: false, bonus: 0 };
-            while (mSt.b.length < 6) { const r = Math.floor(Math.random() * 16); if (!mSt.b.includes(r)) mSt.b.push(r); }
-            let c = '';
-            for (let i = 0; i < 16; i++) c +=
-                `<div class="mine-cell" id="m${i}" onclick="revM(${i})"><i class="fas fa-question" style="color:#f0c040;"></i></div>`;
-            a.innerHTML = `
+        function buildMines(a) { mSt = { act: true, mult: 1, rev: 0, b: [], bet: 100, canCollect: false, bonus: 0 }; while (mSt.b.length < 6) { const r = Math.floor(Math.random() * 16); if (!mSt.b.includes(r)) mSt.b.push(r); } let c = ''; for (let i = 0; i < 16; i++) c +=
+            `<div class="mine-cell" id="m${i}" onclick="revM(${i})"><i class="fas fa-question" style="color:#f0c040;"></i></div>`; a
+            .innerHTML = `
                 <p style="color:#aaa;">3 клетки = +10% | 6 клеток = +20% | Меньше 3 — без бонуса.</p>
                 <input class="bet-input" id="minesBetInput" value="100" type="number" min="15" max="500" onchange="mSt.bet=Math.max(15,Math.min(500,parseInt(this.value)||100))">
                 <div class="mines-field">${c}</div>
                 <div class="result-text" id="mr">Множитель: x1.0 | Угадано: 0</div>
-                <button class="btn btn-play" id="mcoll" onclick="collM()" style="display:none;">ЗАБРАТЬ</button>`;
-        }
-        function revM(i) {
-            if (!mSt.act) return;
-            const el = document.getElementById('m' + i);
-            if (el.style.background === 'rgb(46, 204, 113)' || el.style.background === 'rgb(231, 76, 60)') return;
-            if (mSt.b.includes(i)) {
-                el.style.background = '#e74c3c';
-                el.innerHTML = '<i class="fas fa-bomb" style="color:#fff;"></i>';
-                mSt.act = false;
-                mSt.canCollect = false;
-                document.getElementById('mr').innerHTML =
-                    `<span style="color:#e74c3c;">БОМБА! Вы проиграли ${mSt.bet} STARS</span>`;
-                document.getElementById('mcoll').style.display = 'none';
-                mSt.b.forEach(b => { const bc = document.getElementById('m' + b);
-                    bc.style.background = '#e74c3c';
-                    bc.innerHTML = '<i class="fas fa-bomb" style="color:#fff;"></i>'; });
-                placeBet(mSt.bet);
-                setTimeout(() => { buildMines(document.getElementById('gameArea')); }, 2000);
-            } else {
-                el.style.background = '#2ecc71';
-                el.innerHTML = '<i class="fas fa-gem" style="color:#fff;"></i>';
-                mSt.rev++;
-                if (mSt.rev === 3) { mSt.bonus = 0.1;
-                    mSt.canCollect = true; }
-                if (mSt.rev === 6) { mSt.bonus = 0.2;
-                    mSt.canCollect = true; }
-                mSt.mult = 1 + mSt.bonus;
-                const win = Math.floor(mSt.bet * mSt.mult);
-                const bonusText = mSt.bonus === 0.1 ? ' +10%' : mSt.bonus === 0.2 ? ' +20%' : '';
-                document.getElementById('mr').textContent =
-                    `Множитель: x${mSt.mult.toFixed(1)} | Угадано: ${mSt.rev}${bonusText}`;
-                if (mSt.canCollect) { document.getElementById('mcoll').style.display = 'inline-block';
-                    document.getElementById('mcoll').textContent = `ЗАБРАТЬ (${win} STARS)`;
-                    document.getElementById('mcoll').disabled = false; }
-            }
-        }
+                <button class="btn btn-play" id="mcoll" onclick="collM()" style="display:none;">ЗАБРАТЬ</button>`; }
+        function revM(i) { if (!mSt.act) return; const el = document.getElementById('m' + i); if (el.style.background ===
+                'rgb(46, 204, 113)' || el.style.background === 'rgb(231, 76, 60)') return; if (mSt.b.includes(i)) { el.style
+                .background = '#e74c3c';
+            el.innerHTML = '<i class="fas fa-bomb" style="color:#fff;"></i>';
+            mSt.act = false;
+            mSt.canCollect = false;
+            document.getElementById('mr').innerHTML =
+                `<span style="color:#e74c3c;">БОМБА! Вы проиграли ${mSt.bet} STARS</span>`;
+            document.getElementById('mcoll').style.display = 'none';
+            mSt.b.forEach(b => { const bc = document.getElementById('m' + b);
+                bc.style.background = '#e74c3c';
+                bc.innerHTML = '<i class="fas fa-bomb" style="color:#fff;"></i>'; });
+            placeBet(mSt.bet);
+            setTimeout(() => { buildMines(document.getElementById('gameArea')); }, 2000); } else { el.style.background =
+                '#2ecc71';
+            el.innerHTML = '<i class="fas fa-gem" style="color:#fff;"></i>';
+            mSt.rev++; if (mSt.rev === 3) { mSt.bonus = 0.1;
+                mSt.canCollect = true; } if (mSt.rev === 6) { mSt.bonus = 0.2;
+                mSt.canCollect = true; }
+            mSt.mult = 1 + mSt.bonus; const win = Math.floor(mSt.bet * mSt.mult); const bonusText = mSt.bonus === 0.1 ?
+                ' +10%' : mSt.bonus === 0.2 ? ' +20%' : '';
+            document.getElementById('mr').textContent =
+                `Множитель: x${mSt.mult.toFixed(1)} | Угадано: ${mSt.rev}${bonusText}`; if (mSt.canCollect) { document
+                    .getElementById('mcoll').style.display = 'inline-block';
+                document.getElementById('mcoll').textContent = `ЗАБРАТЬ (${win} STARS)`;
+                document.getElementById('mcoll').disabled = false; } } }
         function collM() { if (!mSt.canCollect || !mSt.act) return; const win = Math.floor(mSt.bet * mSt.mult);
             addWin(win);
             mSt.act = false;
@@ -435,4 +335,6 @@ function spinCase() {
     </script>
 </body>
 </html>
+```
+
 
