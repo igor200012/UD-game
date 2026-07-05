@@ -22,7 +22,6 @@
         .games-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
         .game-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px 14px;text-align:center;cursor:pointer;transition:0.25s}.game-card:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 0 30px rgba(240,192,64,0.2)}.game-card i{font-size:3rem;color:var(--gold);margin-bottom:8px;filter:drop-shadow(0 0 10px var(--gold))}.game-card .name{font-weight:700;color:#ffe9a0;font-size:1.1rem}
         .btn{padding:12px 24px;border-radius:22px;font-weight:700;cursor:pointer;border:none;margin:6px;transition:0.2s;display:inline-block;font-size:0.9rem}.btn-play{background:linear-gradient(135deg,#f0c040,#b8860b);color:#000;width:100%;box-shadow:0 0 20px rgba(240,192,64,0.4)}.btn-play:disabled{opacity:0.4;cursor:not-allowed}.btn-close{background:transparent;border:1px solid #e74c3c;color:#e74c3c;width:100%}
-        .btn-sm{padding:8px 16px;font-size:0.8rem;border-radius:16px}
         .fullscreen-game{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#020108;z-index:500;flex-direction:column;align-items:center;padding:16px;overflow-y:auto}.fullscreen-game.active{display:flex}
         .game-header{width:100%;max-width:600px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.game-header h3{font-size:1.3rem;color:var(--gold);text-shadow:0 0 10px rgba(240,192,64,0.3)}.exit-btn{background:#c0392b;color:#fff;border:none;padding:6px 14px;border-radius:16px;font-weight:700;cursor:pointer;font-size:0.8rem}
         .game-area{width:100%;max-width:600px;text-align:center}
@@ -32,8 +31,7 @@
         .cases-container{position:relative;margin:20px 0;padding:0 30px}
         .cases-window{overflow:hidden;border-radius:16px;background:rgba(0,0,0,0.5);border:1px solid var(--border);padding:10px 0}
         .cases-track{display:flex;gap:0;padding:0;transition:transform 0.05s linear}
-        .case-slot{min-width:100px;height:100px;background:rgba(255,255,255,0.03);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--gold);flex-shrink:0;position:relative}
-        .case-slot::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:0;border-left:1px dashed rgba(255,255,255,0.1)}
+        .case-slot{min-width:100px;height:100px;background:rgba(255,255,255,0.03);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--gold);flex-shrink:0}
         .marker{position:absolute;top:-5px;bottom:-5px;left:50%;transform:translateX(-50%);width:3px;background:var(--red);z-index:10;border-radius:2px;box-shadow:0 0 15px var(--red),0 0 30px var(--red)}.marker::after{content:"";position:absolute;top:-8px;left:50%;transform:translateX(-50%);border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:8px solid var(--red)}
         .mines-field{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:350px;margin:12px auto}
         .mine-cell{aspect-ratio:1;background:#0a0a18;border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;cursor:pointer;transition:0.2s}
@@ -58,54 +56,20 @@
 </head>
 <body>
     <div class="app">
-        <div class="header">
-            <div class="logo"><i class="fas fa-crown"></i><span>STAR GAME</span></div>
-            <div class="header-right">
-                <div class="balance-badge"><i class="fas fa-star"></i><span id="balanceDisplay">1000</span> STARS</div>
-                <i class="fas fa-user-circle profile-icon" onclick="navigate('profile')" title="Профиль"></i>
-            </div>
-        </div>
-        <div class="nav">
-            <div class="nav-btn active" onclick="navigate('games')">ИГРЫ</div>
-            <div class="nav-btn" onclick="navigate('gifts')">ПОДАРКИ</div>
-            <div class="nav-btn" onclick="navigate('deposit')">ПОПОЛНЕНИЕ</div>
-        </div>
-        <div id="page-games" class="page active">
-            <div class="games-grid">
-                <div class="game-card" onclick="openGame('cases')"><i class="fas fa-box-open"></i><div class="name">КЕЙСЫ</div></div>
-                <div class="game-card" onclick="openGame('mines')"><i class="fas fa-bomb"></i><div class="name">МИНЫ</div></div>
-            </div>
-        </div>
+        <div class="header"><div class="logo"><i class="fas fa-crown"></i><span>STAR GAME</span></div><div class="header-right"><div class="balance-badge"><i class="fas fa-star"></i><span id="balanceDisplay">1000</span> STARS</div><i class="fas fa-user-circle profile-icon" onclick="navigate('profile')" title="Профиль"></i></div></div>
+        <div class="nav"><div class="nav-btn active" onclick="navigate('games')">ИГРЫ</div><div class="nav-btn" onclick="navigate('gifts')">ПОДАРКИ</div><div class="nav-btn" onclick="navigate('deposit')">ПОПОЛНЕНИЕ</div></div>
+        <div id="page-games" class="page active"><div class="games-grid"><div class="game-card" onclick="openGame('cases')"><i class="fas fa-box-open"></i><div class="name">КЕЙСЫ</div></div><div class="game-card" onclick="openGame('mines')"><i class="fas fa-bomb"></i><div class="name">МИНЫ</div></div></div></div>
         <div id="page-gifts" class="page"><div style="font-size:1.2rem;font-weight:700;color:var(--gold);margin-bottom:12px;">МОИ ПОДАРКИ</div><div class="gifts-grid" id="myGifts"></div><p style="color:var(--text2);text-align:center;" id="noGifts">Пока нет подарков</p></div>
         <div id="page-deposit" class="page">
             <div class="section-label">ПОПОЛНЕНИЕ</div>
-            <div class="deposit-grid">
-                <div class="deposit-card card-gift" onclick="openDeposit('gift')"><i class="fas fa-gift"></i><h4>ПОДАРКОМ</h4><p>Выбери и отправь</p></div>
-                <div class="deposit-card card-stars" onclick="openDeposit('stars')"><i class="fas fa-star"></i><h4>STARS</h4><p>Telegram Stars</p></div>
-            </div>
+            <div class="deposit-grid"><div class="deposit-card card-gift" onclick="openDeposit('gift')"><i class="fas fa-gift"></i><h4>ПОДАРКОМ</h4><p>Выбери и отправь</p></div><div class="deposit-card card-stars" onclick="openDeposit('stars')"><i class="fas fa-star"></i><h4>STARS</h4><p>Telegram Stars</p></div></div>
             <div class="section-label">ВЫВОД</div>
-            <div style="display:flex;gap:14px;">
-                <div class="deposit-card card-gift" onclick="openWithdraw('gift')" style="flex:1;"><i class="fas fa-gift"></i><h4>ПОДАРКОМ</h4></div>
-                <div class="deposit-card card-stars" onclick="openWithdraw('stars')" style="flex:1;"><i class="fas fa-star"></i><h4>STARS</h4></div>
-            </div>
+            <div style="display:flex;gap:14px;"><div class="deposit-card card-gift" onclick="openWithdraw('gift')" style="flex:1;"><i class="fas fa-gift"></i><h4>ПОДАРКОМ</h4></div><div class="deposit-card card-stars" onclick="openWithdraw('stars')" style="flex:1;"><i class="fas fa-star"></i><h4>STARS</h4></div></div>
         </div>
         <div id="page-profile" class="page">
             <div style="font-size:1.2rem;font-weight:700;color:var(--gold);margin-bottom:12px;">ПРОФИЛЬ</div>
-            <div class="profile-box" id="profileBox">
-                <p style="color:var(--text2);">Зарегистрируйтесь чтобы сохранять прогресс</p>
-                <input type="text" id="profileUsername" placeholder="Придумайте username">
-                <button class="btn btn-play" onclick="registerProfile()">ЗАРЕГИСТРИРОВАТЬСЯ</button>
-            </div>
-            <div class="profile-box" id="profileInfo" style="display:none;">
-                <i class="fas fa-user-circle" style="font-size:3rem;color:var(--gold);"></i>
-                <p style="color:var(--gold);font-size:1.2rem;margin:8px 0;" id="profileName"></p>
-                <p style="color:var(--text2);">Баланс: <span id="profileBalance"></span> STARS</p>
-                <p style="color:var(--text2);">Подарков: <span id="profileGifts"></span></p>
-                <div class="checkbox-row">
-                    <input type="checkbox" id="autoWithdrawCheck" onchange="toggleAutoWithdraw()">
-                    <label for="autoWithdrawCheck">Автовывод на @<span id="autoUsername"></span></label>
-                </div>
-            </div>
+            <div class="profile-box" id="profileBox"><p style="color:var(--text2);">Зарегистрируйтесь чтобы сохранять прогресс</p><input type="text" id="profileUsername" placeholder="Придумайте username"><button class="btn btn-play" onclick="registerProfile()">ЗАРЕГИСТРИРОВАТЬСЯ</button></div>
+            <div class="profile-box" id="profileInfo" style="display:none;"><i class="fas fa-user-circle" style="font-size:3rem;color:var(--gold);"></i><p style="color:var(--gold);font-size:1.2rem;margin:8px 0;" id="profileName"></p><p style="color:var(--text2);">Баланс: <span id="profileBalance"></span> STARS</p><p style="color:var(--text2);">Подарков: <span id="profileGifts"></span></p><div class="checkbox-row"><input type="checkbox" id="autoWithdrawCheck" onchange="toggleAutoWithdraw()"><label for="autoWithdrawCheck">Автовывод на @<span id="autoUsername"></span></label></div></div>
         </div>
     </div>
     <div class="modal-overlay" id="depositModal"><div class="modal-box" id="depositModalBox"></div></div>
@@ -113,47 +77,21 @@
     <div class="fullscreen-game" id="fullGame"><div class="game-header"><h3 id="gameTitle"></h3><div id="gameBalanceTop" class="game-balance"></div><button class="exit-btn" onclick="closeGame()">ВЫЙТИ</button></div><div class="game-area" id="gameArea"></div></div>
 
     <script>
-        let balance = 1000;
-        let myGifts = [];
-        let profile = null;
-        let autoWithdraw = false;
-        let currentGame = null;
-        const save = localStorage.getItem("sg_v28");
-        if (save) { try { const s = JSON.parse(save); balance = s.balance || 1000; myGifts = s.gifts || []; profile = s.profile || null;
-                autoWithdraw = s.autoWithdraw || false; } catch (e) {} }
-        function saveState() { localStorage.setItem("sg_v28", JSON.stringify({ balance, gifts: myGifts, profile, autoWithdraw })); }
+        let balance = 1000; let myGifts = []; let profile = null; let autoWithdraw = false; let currentGame = null;
+        const save = localStorage.getItem("sg_v29"); if (save) { try { const s = JSON.parse(save); balance = s.balance || 1000; myGifts = s.gifts || []; profile = s.profile || null; autoWithdraw = s.autoWithdraw || false; } catch (e) {} }
+        function saveState() { localStorage.setItem("sg_v29", JSON.stringify({ balance, gifts: myGifts, profile, autoWithdraw })); }
         function updateBalance() { document.getElementById("balanceDisplay").textContent = balance.toLocaleString("ru-RU"); const gbt = document.getElementById("gameBalanceTop"); if (gbt) gbt.textContent = "Баланс: " + balance.toLocaleString("ru-RU") + " STARS"; }
         function toast(msg) { const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
-        function navigate(tab) {
-            document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-            document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-            const btns = document.querySelectorAll(".nav-btn");
-            if (tab === "games") { btns[0].classList.add("active"); document.getElementById("page-games").classList.add("active"); }
-            else if (tab === "gifts") { btns[1].classList.add("active"); document.getElementById("page-gifts").classList.add("active"); renderMyGifts(); }
-            else if (tab === "deposit") { btns[2].classList.add("active"); document.getElementById("page-deposit").classList.add("active"); }
-            else if (tab === "profile") { document.getElementById("page-profile").classList.add("active"); renderProfile(); }
-        }
+        function navigate(tab) { document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active")); document.querySelectorAll(".page").forEach(p => p.classList.remove("active")); const btns = document.querySelectorAll(".nav-btn"); if (tab === "games") { btns[0].classList.add("active"); document.getElementById("page-games").classList.add("active"); } else if (tab === "gifts") { btns[1].classList.add("active"); document.getElementById("page-gifts").classList.add("active"); renderMyGifts(); } else if (tab === "deposit") { btns[2].classList.add("active"); document.getElementById("page-deposit").classList.add("active"); } else if (tab === "profile") { document.getElementById("page-profile").classList.add("active"); renderProfile(); } }
         function addWin(amount) { balance += amount; updateBalance(); saveState(); }
         function placeBet(amount) { if (amount > balance) { toast("Недостаточно STARS!"); return false; } balance -= amount; updateBalance(); saveState(); return true; }
         function closeGame() { document.getElementById("fullGame").classList.remove("active"); currentGame = null; }
         function closeModal(id) { document.getElementById(id).classList.remove("open"); }
-
-        function renderProfile() {
-            if (profile) { document.getElementById("profileBox").style.display = "none"; document.getElementById("profileInfo").style.display = "block"; document.getElementById("profileName").textContent = "@" + profile.username; document.getElementById("profileBalance").textContent = balance.toLocaleString("ru-RU"); document.getElementById("profileGifts").textContent = myGifts.length; document.getElementById("autoUsername").textContent = profile.username; document.getElementById("autoWithdrawCheck").checked = autoWithdraw; } else { document.getElementById("profileBox").style.display = "block"; document.getElementById("profileInfo").style.display = "none"; }
-        }
+        function renderProfile() { if (profile) { document.getElementById("profileBox").style.display = "none"; document.getElementById("profileInfo").style.display = "block"; document.getElementById("profileName").textContent = "@" + profile.username; document.getElementById("profileBalance").textContent = balance.toLocaleString("ru-RU"); document.getElementById("profileGifts").textContent = myGifts.length; document.getElementById("autoUsername").textContent = profile.username; document.getElementById("autoWithdrawCheck").checked = autoWithdraw; } else { document.getElementById("profileBox").style.display = "block"; document.getElementById("profileInfo").style.display = "none"; } }
         function registerProfile() { const u = document.getElementById("profileUsername").value.trim(); if (!u) { toast("Введите username"); return; } if (!/^[a-zA-Z][a-zA-Z0-9_]{3,31}$/.test(u)) { toast("Только латиница, от 4 символов"); return; } profile = { username: u, registeredAt: Date.now() }; saveState(); renderProfile(); toast("Профиль создан: @" + u); }
-        function toggleAutoWithdraw() { autoWithdraw = document.getElementById("autoWithdrawCheck").checked;
-            saveState();
-            toast(autoWithdraw ? "Автовывод включён" : "Автовывод выключен"); }
-
-        function renderMyGifts() {
-            const grid = document.getElementById("myGifts"); const no = document.getElementById("noGifts");
-            if (myGifts.length === 0) { grid.innerHTML = ""; no.style.display = "block"; return; }
-            no.style.display = "none"; const icons = { bear: "fa-paw", rose: "fa-heart", gift: "fa-gift", heart: "fa-heart", cake: "fa-cake", rocket: "fa-rocket", bouquet: "fa-leaf" }; const names = { bear: "Мишка", rose: "Роза", gift: "Подарок", heart: "Сердце", cake: "Торт", rocket: "Ракета", bouquet: "Букет" }; const cols = { bear: "#8B4513", rose: "#e91e63", gift: "#f0c040", heart: "#e74c3c", cake: "#ff69b4", rocket: "#3498db", bouquet: "#2ecc71" };
-            grid.innerHTML = myGifts.map((g, i) => `<div class="gift-card" onclick="openGiftActions(${i})"><i class="fas ${icons[g]||"fa-gift"}" style="color:${cols[g]||"#fff"}"></i><div class="gname">${names[g]||g}</div></div>`).join("");
-        }
-        function openGiftActions(i) { const g = myGifts[i]; const names = { bear: "Мишка", rose: "Роза", gift: "Подарок", heart: "Сердце", cake: "Торт", rocket: "Ракета", bouquet: "Букет" }; const prices = { bear: 15, rose: 25, gift: 25, heart: 15, cake: 50, rocket: 50, bouquet: 50 }; const icons = { bear: "fa-paw", rose: "fa-heart", gift: "fa-gift", heart: "fa-heart", cake: "fa-cake", rocket: "fa-rocket", bouquet: "fa-leaf" }; const cols = { bear: "#8B4513", rose: "#e91e63", gift: "#f0c040", heart: "#e74c3c", cake: "#ff69b4", rocket: "#3498db", bouquet: "#2ecc71" }; const m = document.getElementById("giftActionModal"); const b = document.getElementById("giftActionModalBox");
-            m.classList.add("open"); b.innerHTML = `<h3>${names[g]}</h3><i class="fas ${icons[g]}" style="font-size:3rem;color:${cols[g]};margin:10px 0;"></i><p style="color:var(--gold);font-size:1.1rem;">Цена: ${prices[g]} STARS</p><button class="btn btn-play" onclick="sellGiftFromModal(${i})">ПРОДАТЬ</button><button class="btn btn-play" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;" onclick="withdrawGiftFromModal(${i})">ВЫВЕСТИ</button><button class="btn btn-close" onclick="closeModal('giftActionModal')">ОТМЕНА</button>`; }
+        function toggleAutoWithdraw() { autoWithdraw = document.getElementById("autoWithdrawCheck").checked; saveState(); toast(autoWithdraw ? "Автовывод включён" : "Автовывод выключен"); }
+        function renderMyGifts() { const grid = document.getElementById("myGifts"); const no = document.getElementById("noGifts"); if (myGifts.length === 0) { grid.innerHTML = ""; no.style.display = "block"; return; } no.style.display = "none"; const icons = { bear: "fa-paw", rose: "fa-heart", gift: "fa-gift", heart: "fa-heart", cake: "fa-cake", rocket: "fa-rocket", bouquet: "fa-leaf" }; const names = { bear: "Мишка", rose: "Роза", gift: "Подарок", heart: "Сердце", cake: "Торт", rocket: "Ракета", bouquet: "Букет" }; const cols = { bear: "#8B4513", rose: "#e91e63", gift: "#f0c040", heart: "#e74c3c", cake: "#ff69b4", rocket: "#3498db", bouquet: "#2ecc71" }; grid.innerHTML = myGifts.map((g, i) => `<div class="gift-card" onclick="openGiftActions(${i})"><i class="fas ${icons[g]||"fa-gift"}" style="color:${cols[g]||"#fff"}"></i><div class="gname">${names[g]||g}</div></div>`).join(""); }
+        function openGiftActions(i) { const g = myGifts[i]; const names = { bear: "Мишка", rose: "Роза", gift: "Подарок", heart: "Сердце", cake: "Торт", rocket: "Ракета", bouquet: "Букет" }; const prices = { bear: 15, rose: 25, gift: 25, heart: 15, cake: 50, rocket: 50, bouquet: 50 }; const icons = { bear: "fa-paw", rose: "fa-heart", gift: "fa-gift", heart: "fa-heart", cake: "fa-cake", rocket: "fa-rocket", bouquet: "fa-leaf" }; const cols = { bear: "#8B4513", rose: "#e91e63", gift: "#f0c040", heart: "#e74c3c", cake: "#ff69b4", rocket: "#3498db", bouquet: "#2ecc71" }; const m = document.getElementById("giftActionModal"); const b = document.getElementById("giftActionModalBox"); m.classList.add("open"); b.innerHTML = `<h3>${names[g]}</h3><i class="fas ${icons[g]}" style="font-size:3rem;color:${cols[g]};margin:10px 0;"></i><p style="color:var(--gold);font-size:1.1rem;">Цена: ${prices[g]} STARS</p><button class="btn btn-play" onclick="sellGiftFromModal(${i})">ПРОДАТЬ</button><button class="btn btn-play" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;" onclick="withdrawGiftFromModal(${i})">ВЫВЕСТИ</button><button class="btn btn-close" onclick="closeModal('giftActionModal')">ОТМЕНА</button>`; }
         function sellGiftFromModal(i) { const p = { bear: 15, rose: 25, gift: 25, heart: 15, cake: 50, rocket: 50, bouquet: 50 }; const g = myGifts[i]; balance += p[g] || 0; myGifts.splice(i, 1); updateBalance(); saveState(); renderMyGifts(); closeModal("giftActionModal"); toast("Подарок продан за " + (p[g] || 0) + " STARS!"); }
         function withdrawGiftFromModal(i) { if (autoWithdraw && profile) { confirmWithdrawGiftAuto(i); return; } const g = myGifts[i]; const names = { bear: "Мишка", rose: "Роза", gift: "Подарок", heart: "Сердце", cake: "Торт", rocket: "Ракета", bouquet: "Букет" }; const b = document.getElementById("giftActionModalBox"); b.innerHTML = `<h3>ВЫВОД: ${names[g]}</h3><p style="color:#e91e63;font-size:0.9rem;">Укажите ваш @username:</p><input type="text" id="withdrawGiftUser" value="" placeholder="username" oninput="validateUsername(this)"><button class="btn btn-play" onclick="confirmWithdrawGiftFromModal(${i})">ВЫВЕСТИ</button><button class="btn btn-close" onclick="closeModal('giftActionModal')">ОТМЕНА</button>`; }
         function confirmWithdrawGiftAuto(i) { const g = myGifts[i]; const names = { bear: "Мишка", rose: "Роза", gift: "Подарок", heart: "Сердце", cake: "Торт", rocket: "Ракета", bouquet: "Букет" }; myGifts.splice(i, 1); saveState(); renderMyGifts(); closeModal("giftActionModal"); toast("Подарок \"" + names[g] + "\" отправлен на @" + profile.username + " (автовывод)"); }
@@ -165,11 +103,13 @@
         function confirmGiftDeposit() { const a = window._giftVal; document.getElementById("depositModalBox").innerHTML = "<h3>ПЕРЕВЕДИТЕ ПОДАРОК</h3><p style=\"color:#e91e63;font-size:1rem;\">Переведите подарок на @AdminStarGame</p><p style=\"color:#f0c040;font-size:1.3rem;font-weight:800;\">Сумма: " + a + " STARS</p><button class=\"btn btn-play\" onclick=\"finalizeGift(" + a + ")\">ГОТОВО</button><button class=\"btn btn-close\" onclick=\"closeModal('depositModal')\">ОТМЕНА</button>"; }
         function finalizeGift(a) { toast("Подарок на " + a + " STARS отправлен"); closeModal("depositModal"); }
         function confirmDep() { const a = parseInt(document.getElementById("depAmt").value) || 0; if (a < 15) { toast("Минимум 15"); return; } if (a > 16000) { toast("Максимум 16000"); return; } toast("Заявка на " + a + " STARS принята!"); closeModal("depositModal"); }
-        function openWithdraw(method) { const m = document.getElementById("depositModal"); const b = document.getElementById("depositModalBox"); m.classList.add("open"); if (method === "gift") { b.innerHTML = "<h3>ВЫБЕРИ ПОДАРОК ДЛЯ ВЫВОДА</h3><div class=\"gift-grid\"><div class=\"gift-option selected\" onclick=\"selWGift(this,50)\"><div class=\"gicon\"><i class=\"fas fa-heart\"></i></div><div class=\"gname\">Роза</div><div class=\"gprice\">50 STARS</div></div><div class=\"gift-option\" onclick=\"selWGift(this,100)\"><div class=\"gicon\"><i class=\"fas fa-star\"></i></div><div class=\"gname\">Звезда</div><div class=\"gprice\">100 STARS</div></div><div class=\"gift-option\" onclick=\"selWGift(this,200)\"><div class=\"gicon\"><i class=\"fas fa-gem\"></i></div><div class=\"gname\">Бриллиант</div><div class=\"gprice\">200 STARS</div></div><div class=\"gift-option\" onclick=\"selWGift(this,500)\"><div class=\"gicon\"><i class=\"fas fa-crown\"></i></div><div class=\"gname\">Корона</div><div class=\"gprice\">500 STARS</div></div><div class=\"gift-option\" onclick=\"selWGift(this,1000)\"><div class=\"gicon\"><i class=\"fas fa-trophy\"></i></div><div class=\"gname\">Премиум</div><div class=\"gprice\">1000 STARS</div></div></div><button class=\"btn btn-play\" onclick=\"goToWithdrawUsername()\">ДАЛЕЕ</button><button class=\"btn btn-close\" onclick=\"closeModal('depositModal')\">ОТМЕНА</button>"; window._wgiftVal = 50; } else { b.innerHTML = "<h3>ВЫВОД STARS</h3><input type=\"number\" id=\"withdrawStarsAmt\" value=\"15\" min=\"15\" max=\"" + balance + "\"><p style=\"font-size:0.7rem;color:#888;\">Мин: 15 | Доступно: " + balance + " STARS</p><input type=\"text\" id=\"withUser\" value=\"\" placeholder=\"username\" oninput=\"validateUsername(this)\"><button class=\"btn btn-play\" onclick=\"confirmWithdrawStars()\">ВЫВЕСТИ</button><button class=\"btn btn-close\" onclick=\"closeModal('depositModal')\">ОТМЕНА</button>"; } }
+        function openWithdraw(method) { const m = document.getElementById("depositModal"); const b = document.getElementById("depositModalBox"); m.classList.add("open"); if (method === "gift") { b.innerHTML = "<h3>ВЫБЕРИ ПОДАРОК ДЛЯ ВЫВОДА</h3><div class=\"gift-grid\"><div class=\"gift-option selected\" onclick=\"selWGift(this,50)\"><div class=\"gicon\"><i class=\"fas fa-heart\"></i></div><div class=\"gname\">Роза</div><div class=\"gprice\">50 STARS</div></div><div class=\"gift-option\" onclick=\"selWGift(this,100)\"><div class=\"gicon\"><i class=\"fas fa-star\"></i></div><div class=\"gname\">Звезда</div><div class=\"gprice\">100 STARS</div></div><div class=\"gift-option\" onclick=\"selWGift(this,200)\"><div class=\"gicon\"><i class=\"fas fa-gem\"></i></div><div class=\"gname\">Бриллиант</div><div class=\"gprice\">200 STARS</div></div><div class=\"gift-option\" onclick=\"selWGift(this,500)\"><div class=\"gicon\"><i class=\"fas fa-crown\"></i></div><div class=\"gname\">Корона</div><div class=\"gprice\">500 STARS</div></div><div class=\"gift-option\" onclick=\"selWGift(this,1000)\"><div class=\"gicon\"><i class=\"fas fa-trophy\"></i></div><div class=\"gname\">Премиум</div><div class=\"gprice\">1000 STARS</div></div></div><button class=\"btn btn-play\" onclick=\"goToWithdrawUsername()\">ДАЛЕЕ</button><button class=\"btn btn-close\" onclick=\"closeModal('depositModal')\">ОТМЕНА</button>"; window._wgiftVal = 50; } else { if (autoWithdraw && profile) { b.innerHTML = "<h3>ВЫВОД STARS</h3><p style=\"color:#f0c040;\">Автовывод на @" + profile.username + "</p><input type=\"number\" id=\"withdrawStarsAmt\" value=\"15\" min=\"15\" max=\"" + balance + "\"><p style=\"font-size:0.7rem;color:#888;\">Мин: 15 | Доступно: " + balance + " STARS</p><button class=\"btn btn-play\" onclick=\"confirmWithdrawStarsAuto()\">ВЫВЕСТИ</button><button class=\"btn btn-close\" onclick=\"closeModal('depositModal')\">ОТМЕНА</button>"; } else { b.innerHTML = "<h3>ВЫВОД STARS</h3><input type=\"number\" id=\"withdrawStarsAmt\" value=\"15\" min=\"15\" max=\"" + balance + "\"><p style=\"font-size:0.7rem;color:#888;\">Мин: 15 | Доступно: " + balance + " STARS</p><input type=\"text\" id=\"withUser\" value=\"\" placeholder=\"username\" oninput=\"validateUsername(this)\"><button class=\"btn btn-play\" onclick=\"confirmWithdrawStars()\">ВЫВЕСТИ</button><button class=\"btn btn-close\" onclick=\"closeModal('depositModal')\">ОТМЕНА</button>"; } } }
         function selWGift(el, val) { document.querySelectorAll("#depositModalBox .gift-option").forEach(x => x.classList.remove("selected")); el.classList.add("selected"); window._wgiftVal = val; }
-        function goToWithdrawUsername() { const b = document.getElementById("depositModalBox"); b.innerHTML = "<h3>ВЫВОД ПОДАРКОМ</h3><p style=\"color:#f0c040;\">Выбран подарок на " + window._wgiftVal + " STARS</p><input type=\"text\" id=\"withUser\" value=\"\" placeholder=\"username\" oninput=\"validateUsername(this)\"><button class=\"btn btn-play\" onclick=\"confirmWithdrawGift()\">ВЫВЕСТИ</button><button class=\"btn btn-close\" onclick=\"closeModal('depositModal')\">ОТМЕНА</button>"; }
+        function goToWithdrawUsername() { const b = document.getElementById("depositModalBox"); if (autoWithdraw && profile) { b.innerHTML = "<h3>ВЫВОД ПОДАРКОМ</h3><p style=\"color:#f0c040;\">Выбран подарок на " + window._wgiftVal + " STARS</p><p style=\"color:#f0c040;\">Автовывод на @" + profile.username + "</p><button class=\"btn btn-play\" onclick=\"confirmWithdrawGiftAuto()\">ВЫВЕСТИ</button><button class=\"btn btn-close\" onclick=\"closeModal('depositModal')\">ОТМЕНА</button>"; } else { b.innerHTML = "<h3>ВЫВОД ПОДАРКОМ</h3><p style=\"color:#f0c040;\">Выбран подарок на " + window._wgiftVal + " STARS</p><input type=\"text\" id=\"withUser\" value=\"\" placeholder=\"username\" oninput=\"validateUsername(this)\"><button class=\"btn btn-play\" onclick=\"confirmWithdrawGift()\">ВЫВЕСТИ</button><button class=\"btn btn-close\" onclick=\"closeModal('depositModal')\">ОТМЕНА</button>"; } }
         function confirmWithdrawGift() { const raw = document.getElementById("withUser").value.trim(); const user = raw.replace(/@/g, ""); if (!user) { toast("Введите @username"); return; } if (!/^[a-zA-Z][a-zA-Z0-9_]{3,31}$/.test(user)) { toast("Некорректный username"); return; } balance -= window._wgiftVal; updateBalance(); saveState(); toast("Заявка на вывод для @" + user + " принята!"); closeModal("depositModal"); }
+        function confirmWithdrawGiftAuto() { balance -= window._wgiftVal; updateBalance(); saveState(); toast("Подарок отправлен на @" + profile.username + " (автовывод)"); closeModal("depositModal"); }
         function confirmWithdrawStars() { const raw = document.getElementById("withUser").value.trim(); const user = raw.replace(/@/g, ""); if (!user) { toast("Введите @username"); return; } if (!/^[a-zA-Z][a-zA-Z0-9_]{3,31}$/.test(user)) { toast("Некорректный username"); return; } const a = parseInt(document.getElementById("withdrawStarsAmt").value) || 0; if (a < 15) { toast("Минимум 15 STARS для вывода"); return; } if (a > balance) { toast("Недостаточно средств"); return; } balance -= a; updateBalance(); saveState(); toast("Заявка на вывод " + a + " STARS для @" + user + " принята!"); closeModal("depositModal"); }
+        function confirmWithdrawStarsAuto() { const a = parseInt(document.getElementById("withdrawStarsAmt").value) || 0; if (a < 15) { toast("Минимум 15 STARS для вывода"); return; } if (a > balance) { toast("Недостаточно средств"); return; } balance -= a; updateBalance(); saveState(); toast("Вывод " + a + " STARS на @" + profile.username + " (автовывод)"); closeModal("depositModal"); }
 
         function openGame(game) { currentGame = game; document.getElementById("fullGame").classList.add("active"); document.getElementById("gameTitle").textContent = game === "cases" ? "КЕЙСЫ" : "МИНЫ"; updateBalance(); const a = document.getElementById("gameArea"); if (game === "cases") buildCases(a); if (game === "mines") buildMines(a); }
 
@@ -203,71 +143,68 @@
             a.innerHTML = `<p style="color:#aaa;">Крути кейс за 15 STARS. Что под стрелкой — то и получаешь.</p><div class="cases-container"><div class="marker"></div><div class="cases-window"><div class="cases-track" id="casesTrack">${slotsHTML}</div></div></div><div class="result-text" id="caseResult"></div><button class="btn btn-play" id="caseBtn" onclick="spinCase()">ОТКРЫТЬ КЕЙС (15 STARS)</button>`;
             window._slotsList = slotsList;
         }
-        function spinCase() { if (balance < 15) { toast("Недостаточно STARS! Нужно 15."); return; } balance -= 15; updateBalance(); saveState(); const btn = document.getElementById("caseBtn");
-            btn.disabled = true;
-            btn.textContent = "КРУТИМ...";
-            document.getElementById("caseResult").innerHTML = ""; const slotsList = window._slotsList; const slotWidth = 100; const r = Math.random() * totalChance; let cum = 0,
-                winner = allCaseItems[0]; for (const item of allCaseItems) { cum += item.chance; if (r <= cum) { winner = item; break; } } let winnerIdx = 0; for (let i = 0; i < slotsList.length; i++) { if (slotsList[i].type === winner.type && (winner.type === "stars" ? slotsList[i].amount === winner.amount : slotsList[i].id === winner.id)) { winnerIdx = i; break; } } const targetSlotIndex = slotsList.length + winnerIdx; const track = document.getElementById("casesTrack"); const targetPos = -(targetSlotIndex * slotWidth) + (window.innerWidth / 2 - slotWidth / 2); const duration = 5000; const startTime = Date.now();
 
-            function animate() { const elapsed = Date.now() - startTime; const progress = Math.min(1, elapsed / duration); const eased = 1 - Math.pow(1 - progress, 3);
-                track.style.transform = "translateX(" + (targetPos * eased) + "px)"; if (progress < 1) requestAnimationFrame(animate); else { if (winner.type === "gift") { myGifts.push(winner.id);
-                        saveState();
-                        document.getElementById("caseResult").innerHTML = `<span style="color:var(--gold);">${winner.name} отправлен в подарки!</span>`;
-                        toast("Получен подарок: " + winner.name + "!"); } else { addWin(winner.amount);
-                        document.getElementById("caseResult").innerHTML = `<span style="color:var(--gold);">+${winner.amount} STARS!</span>`;
-                        toast("Получено " + winner.amount + " STARS!"); }
-                    btn.disabled = false;
-                    btn.textContent = "ОТКРЫТЬ КЕЙС (15 STARS)";
-                    track.style.transition = "none";
-                    track.style.transform = "translateX(0px)";
-                    setTimeout(() => { track.style.transition = ""; }, 50); } }
-            track.style.transition = "none";
-            track.style.transform = "translateX(0px)";
-            setTimeout(() => { track.style.transition = "transform 0.05s linear";
-                requestAnimationFrame(animate); }, 50); }
+        function spinCase() {
+            if (balance < 15) { toast("Недостаточно STARS! Нужно 15."); return; }
+            balance -= 15; updateBalance(); saveState();
+            const btn = document.getElementById("caseBtn"); btn.disabled = true; btn.textContent = "КРУТИМ...";
+            document.getElementById("caseResult").innerHTML = "";
+            const slotsList = window._slotsList; const slotWidth = 100;
+            const r = Math.random() * totalChance; let cum = 0, winner = allCaseItems[0];
+            for (const item of allCaseItems) { cum += item.chance; if (r <= cum) { winner = item; break; } }
+            let winnerIdx = 0;
+            for (let i = 0; i < slotsList.length; i++) { if (slotsList[i].type === winner.type && (winner.type === "stars" ? slotsList[i].amount === winner.amount : slotsList[i].id === winner.id)) { winnerIdx = i; break; } }
+            const targetSlotIndex = slotsList.length + winnerIdx;
+            const track = document.getElementById("casesTrack");
+            const targetPos = -(targetSlotIndex * slotWidth) + (window.innerWidth / 2 - slotWidth / 2);
+            const spinDuration = 4000;
+            const snapDuration = 800;
+            const startTime = Date.now();
+
+            function animateSpin() {
+                const elapsed = Date.now() - startTime;
+                if (elapsed < spinDuration) {
+                    const progress = elapsed / spinDuration;
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    const noise = Math.sin(elapsed * 0.02) * 15 * (1 - progress);
+                    track.style.transform = "translateX(" + ((targetPos + noise) * eased) + "px)";
+                    requestAnimationFrame(animateSpin);
+                } else {
+                    track.style.transform = "translateX(" + targetPos + "px)";
+                    const snapStart = Date.now();
+                    function animateSnap() {
+                        const snapElapsed = Date.now() - snapStart;
+                        const snapProgress = Math.min(1, snapElapsed / snapDuration);
+                        const snapEased = 1 - Math.pow(1 - snapProgress, 2);
+                        const overshoot = Math.sin(snapProgress * Math.PI) * 8 * (1 - snapProgress);
+                        track.style.transform = "translateX(" + (targetPos + overshoot * (1 - snapEased)) + "px)";
+                        if (snapProgress < 1) { requestAnimationFrame(animateSnap); } else {
+                            track.style.transform = "translateX(" + targetPos + "px)";
+                            if (winner.type === "gift") { myGifts.push(winner.id); saveState(); document.getElementById("caseResult").innerHTML = `<span style="color:var(--gold);">${winner.name} отправлен в подарки!</span>`; toast("Получен подарок: " + winner.name + "!"); } else { addWin(winner.amount); document.getElementById("caseResult").innerHTML = `<span style="color:var(--gold);">+${winner.amount} STARS!</span>`; toast("Получено " + winner.amount + " STARS!"); }
+                            btn.disabled = false; btn.textContent = "ОТКРЫТЬ КЕЙС (15 STARS)";
+                            track.style.transition = "none"; track.style.transform = "translateX(0px)";
+                            setTimeout(() => { track.style.transition = ""; }, 50);
+                        }
+                    }
+                    requestAnimationFrame(animateSnap);
+                }
+            }
+            track.style.transition = "none"; track.style.transform = "translateX(0px)";
+            setTimeout(() => { track.style.transition = "transform 0.05s linear"; requestAnimationFrame(animateSpin); }, 50);
+        }
 
         let mSt = { act: false, mult: 1, rev: 0, b: [], bet: 15, canCollect: false, bonus: 0, locked: true };
         function buildMines(a) { const prevBet = mSt.bet; mSt = { act: true, mult: 1, rev: 0, b: [], bet: prevBet || 15, canCollect: false, bonus: 0, locked: true }; while (mSt.b.length < 6) { const r = Math.floor(Math.random() * 16); if (!mSt.b.includes(r)) mSt.b.push(r); } let c = ""; for (let i = 0; i < 16; i++) c += `<div class="mine-cell locked" id="m${i}" onclick="revM(${i})"><i class="fas fa-question" style="color:#f0c040;"></i></div>`; a.innerHTML = `<p style="color:#aaa;">Введите ставку чтобы начать. 3 клетки = +10% | 6 клеток = +20%</p><input class="bet-input" id="minesBetInput" value="${mSt.bet}" type="number" min="15" max="500" onchange="updateMinesBet(this)"><div class="mines-field">${c}</div><div class="result-text" id="mr">Ожидание ставки...</div><button class="btn btn-play" id="mcoll" onclick="collM()" style="display:none;">ЗАБРАТЬ</button><button class="btn btn-play" id="mstart" onclick="startMines()">НАЧАТЬ ИГРУ</button>`; }
-        function updateMinesBet(el) { let v = parseInt(el.value) || 15; if (v < 15) { v = 15;
-                el.value = 15;
-                toast("Минимальная ставка: 15 STARS"); } if (v > 500) { v = 500;
-                el.value = 500; } mSt.bet = v; if (mSt.locked) { document.getElementById("mr").textContent = "Ставка: " + v + " STARS | Нажмите НАЧАТЬ ИГРУ"; } }
-        function startMines() { if (mSt.bet > balance) { toast("Недостаточно STARS!"); return; } if (mSt.bet < 15) { mSt.bet = 15;
-                document.getElementById("minesBetInput").value = 15;
-                toast("Минимальная ставка: 15 STARS"); return; } mSt.locked = false;
-            document.getElementById("mr").textContent = "Множитель: x1.0 | Угадано: 0";
-            document.getElementById("mstart").style.display = "none";
-            document.querySelectorAll(".mine-cell").forEach(c => c.classList.remove("locked")); }
-        function revM(i) { if (!mSt.act || mSt.locked) return; if (mSt.bet > balance) { toast("Недостаточно STARS!"); return; } const el = document.getElementById("m" + i); if (el.style.background === "rgb(46, 204, 113)" || el.style.background === "rgb(231, 76, 60)") return; if (mSt.b.includes(i)) { el.style.background = "#e74c3c";
-            el.innerHTML = '<i class="fas fa-bomb" style="color:#fff;"></i>';
-            mSt.act = false;
-            mSt.canCollect = false;
-            document.getElementById("mr").innerHTML = `<span style="color:#e74c3c;">БОМБА! Вы проиграли ${mSt.bet} STARS</span>`;
-            document.getElementById("mcoll").style.display = "none";
-            mSt.b.forEach(b => { const bc = document.getElementById("m" + b);
-                bc.style.background = "#e74c3c";
-                bc.innerHTML = '<i class="fas fa-bomb" style="color:#fff;"></i>'; });
-            placeBet(mSt.bet);
-            setTimeout(() => { buildMines(document.getElementById("gameArea")); }, 2000); } else { el.style.background = "#2ecc71";
-            el.innerHTML = '<i class="fas fa-gem" style="color:#fff;"></i>';
-            mSt.rev++; if (mSt.rev === 3) { mSt.bonus = 0.1;
-                mSt.canCollect = true; } if (mSt.rev === 6) { mSt.bonus = 0.2;
-                mSt.canCollect = true; }
-            mSt.mult = 1 + mSt.bonus; const win = Math.floor(mSt.bet * mSt.mult); const bonusText = mSt.bonus === 0.1 ? " +10%" : mSt.bonus === 0.2 ? " +20%" : "";
-            document.getElementById("mr").textContent = `Множитель: x${mSt.mult.toFixed(1)} | Угадано: ${mSt.rev}${bonusText}`; if (mSt.canCollect) { document.getElementById("mcoll").style.display = "inline-block";
-                document.getElementById("mcoll").textContent = `ЗАБРАТЬ (${win} STARS)`;
-                document.getElementById("mcoll").disabled = false; } } }
-        function collM() { if (!mSt.canCollect || !mSt.act) return; const win = Math.floor(mSt.bet * mSt.mult);
-            addWin(win);
-            buildMines(document.getElementById("gameArea"));
-            toast("Выигрыш получен! Новая игра."); }
+        function updateMinesBet(el) { let v = parseInt(el.value) || 15; if (v < 15) { v = 15; el.value = 15; toast("Минимальная ставка: 15 STARS"); } if (v > 500) { v = 500; el.value = 500; } mSt.bet = v; if (mSt.locked) { document.getElementById("mr").textContent = "Ставка: " + v + " STARS | Нажмите НАЧАТЬ ИГРУ"; } }
+        function startMines() { if (mSt.bet > balance) { toast("Недостаточно STARS!"); return; } if (mSt.bet < 15) { mSt.bet = 15; document.getElementById("minesBetInput").value = 15; toast("Минимальная ставка: 15 STARS"); return; } mSt.locked = false; document.getElementById("mr").textContent = "Множитель: x1.0 | Угадано: 0"; document.getElementById("mstart").style.display = "none"; document.querySelectorAll(".mine-cell").forEach(c => c.classList.remove("locked")); }
+        function revM(i) { if (!mSt.act || mSt.locked) return; if (mSt.bet > balance) { toast("Недостаточно STARS!"); return; } const el = document.getElementById("m" + i); if (el.style.background === "rgb(46, 204, 113)" || el.style.background === "rgb(231, 76, 60)") return; if (mSt.b.includes(i)) { el.style.background = "#e74c3c"; el.innerHTML = '<i class="fas fa-bomb" style="color:#fff;"></i>'; mSt.act = false; mSt.canCollect = false; document.getElementById("mr").innerHTML = `<span style="color:#e74c3c;">БОМБА! Вы проиграли ${mSt.bet} STARS</span>`; document.getElementById("mcoll").style.display = "none"; mSt.b.forEach(b => { const bc = document.getElementById("m" + b); bc.style.background = "#e74c3c"; bc.innerHTML = '<i class="fas fa-bomb" style="color:#fff;"></i>'; }); placeBet(mSt.bet); setTimeout(() => { buildMines(document.getElementById("gameArea")); }, 2000); } else { el.style.background = "#2ecc71"; el.innerHTML = '<i class="fas fa-gem" style="color:#fff;"></i>'; mSt.rev++; if (mSt.rev === 3) { mSt.bonus = 0.1; mSt.canCollect = true; } if (mSt.rev === 6) { mSt.bonus = 0.2; mSt.canCollect = true; } mSt.mult = 1 + mSt.bonus; const win = Math.floor(mSt.bet * mSt.mult); const bonusText = mSt.bonus === 0.1 ? " +10%" : mSt.bonus === 0.2 ? " +20%" : ""; document.getElementById("mr").textContent = `Множитель: x${mSt.mult.toFixed(1)} | Угадано: ${mSt.rev}${bonusText}`; if (mSt.canCollect) { document.getElementById("mcoll").style.display = "inline-block"; document.getElementById("mcoll").textContent = `ЗАБРАТЬ (${win} STARS)`; document.getElementById("mcoll").disabled = false; } } }
+        function collM() { if (!mSt.canCollect || !mSt.act) return; const win = Math.floor(mSt.bet * mSt.mult); addWin(win); buildMines(document.getElementById("gameArea")); toast("Выигрыш получен! Новая игра."); }
 
-        updateBalance();
-        renderMyGifts();
-        renderProfile();
+        updateBalance(); renderMyGifts(); renderProfile();
     </script>
 </body>
 </html>
+
 
 
 
