@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Star Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root { --bg:#020108; --card:#08081a; --gold:#f0c040; --gold2:#b8860b; --red:#e74c3c; --green:#2ecc71; --blue:#3498db; --purple:#7c3aed; --border:#1a1a30; --text:#ccc; --text2:#888; }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+        body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(1px 1px at 10% 15%,rgba(255,255,255,0.6),transparent),radial-gradient(1px 1px at 25% 35%,rgba(255,255,255,0.5),transparent),radial-gradient(1.5px 1.5px at 40% 10%,rgba(240,192,64,0.7),transparent),radial-gradient(1px 1px at 55% 50%,rgba(255,255,255,0.4),transparent),radial-gradient(1px 1px at 70% 25%,rgba(255,255,255,0.5),transparent),radial-gradient(1px 1px at 15% 65%,rgba(255,255,255,0.4),transparent);pointer-events:none;z-index:0}
+        body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;box-shadow:inset 0 0 250px 80px rgba(60,0,140,0.08);pointer-events:none;z-index:0}
+        .app{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:10px}
+        .header{background:rgba(6,6,20,0.9);border:1px solid rgba(240,192,64,0.25);border-radius:22px;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;backdrop-filter:blur(20px);margin-bottom:10px}
+        .logo{display:flex;align-items:center;gap:8px}.logo i{font-size:1.8rem;color:var(--gold);filter:drop-shadow(0 0 12px var(--gold))}.logo span{font-size:1.4rem;font-weight:800;background:linear-gradient(180deg,#ffe9a0,#d4a020);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .balance-badge{background:rgba(0,0,0,0.6);border:1px solid var(--gold);border-radius:30px;padding:8px 16px;display:flex;align-items:center;gap:6px;box-shadow:0 0 20px rgba(240,192,64,0.2)}.balance-badge i{color:var(--gold)}#balanceDisplay{font-weight:700;color:var(--gold);font-size:1.1rem}
+        .nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.nav-btn{flex:1;min-width:60px;padding:12px;border-radius:16px;font-weight:700;font-size:0.75rem;cursor:pointer;text-align:center;background:rgba(15,15,35,0.8);border:1px solid transparent;color:#999;transition:0.25s;text-transform:uppercase}.nav-btn.active{background:rgba(35,15,55,0.9);border-color:var(--gold);color:var(--gold);box-shadow:0 0 25px rgba(240,192,64,0.3)}
+        .page{display:none}.page.active{display:block}
+        .games-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+        .game-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px 14px;text-align:center;cursor:pointer;transition:0.25s}.game-card:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 0 30px rgba(240,192,64,0.2)}.game-card i{font-size:3rem;color:var(--gold);margin-bottom:8px;filter:drop-shadow(0 0 10px var(--gold))}.game-card .name{font-weight:700;color:#ffe9a0;font-size:1.1rem}
+        .btn{padding:12px 24px;border-radius:22px;font-weight:700;cursor:pointer;border:none;margin:6px;transition:0.2s;display:inline-block;font-size:0.9rem}.btn-play{background:linear-gradient(135deg,#f0c040,#b8860b);color:#000;width:100%;box-shadow:0 0 20px rgba(240,192,64,0.4)}.btn-play:disabled{opacity:0.4;cursor:not-allowed}.btn-close{background:transparent;border:1px solid #e74c3c;color:#e74c3c;width:100%}
+        .fullscreen-game{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#020108;z-index:500;flex-direction:column;align-items:center;padding:16px;overflow-y:auto}.fullscreen-game.active{display:flex}
+        .game-header{width:100%;max-width:600px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.game-header h3{font-size:1.5rem;color:var(--gold);text-shadow:0 0 15px rgba(240,192,64,0.4)}.exit-btn{background:#c0392b;color:#fff;border:none;padding:8px 18px;border-radius:20px;font-weight:700;cursor:pointer}
+        .game-area{width:100%;max-width:600px;text-align:center}
+        .result-text{font-size:1.3rem;font-weight:700;margin:10px 0;min-height:32px}
+        .bet-input{width:150px;padding:10px;background:#02010a;border:1px solid var(--gold);border-radius:14px;color:var(--gold);font-weight:700;text-align:center;font-size:1rem;outline:none;margin:8px auto;display:block}
+        .cases-container{position:relative;margin:20px 0;padding:0 30px}
+        .cases-window{overflow:hidden;border-radius:16px;background:rgba(0,0,0,0.5);border:1px solid var(--border);padding:10px 0}
+        .cases-track{display:flex;gap:12px;padding:0 20px;transition:transform 0.05s linear}
+        .case-slot{min-width:90px;height:90px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--gold);flex-shrink:0;position:relative}
+        .marker{position:absolute;top:-5px;bottom:-5px;left:50%;transform:translateX(-50%);width:3px;background:var(--red);z-index:10;border-radius:2px;box-shadow:0 0 10px var(--red)}
+        .marker::after{content:'';position:absolute;top:-8px;left:50%;transform:translateX(-50%);border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:8px solid var(--red)}
+        .mines-field{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:350px;margin:12px auto}
+        .mine-cell{aspect-ratio:1;background:#0a0a18;border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;cursor:pointer;transition:0.2s}
+        .gifts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
+        .gift-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px;text-align:center;cursor:pointer;transition:0.2s}.gift-card:hover{border-color:var(--gold)}.gift-card i{font-size:2rem}.gift-card .gname{font-size:0.7rem;color:#ddd;margin:4px 0}.gift-card .gprice{font-size:0.65rem;color:var(--gold)}
+        .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,1,8,0.95);z-index:600;justify-content:center;align-items:center;padding:20px}.modal-overlay.open{display:flex}
+        .modal-box{background:#06061a;border:1px solid var(--gold);border-radius:24px;padding:24px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(240,192,64,0.3)}.modal-box h3{color:var(--gold);margin-bottom:12px}
+        .modal-box input{width:100%;padding:12px;background:#02010a;border:1px solid var(--gold);border-radius:14px;color:var(--gold);font-weight:700;text-align:center;font-size:1.1rem;outline:none;margin:8px 0}
+        .gift-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}.gift-option{background:#0a0a1e;border:1px solid #2a2a40;border-radius:14px;padding:10px;cursor:pointer;transition:0.2s;text-align:center}.gift-option.selected{border-color:#e91e63;background:rgba(233,30,99,0.15);box-shadow:0 0 15px rgba(233,30,99,0.3)}.gift-option .gicon{font-size:1.8rem;color:#e91e63}.gift-option .gname{font-size:0.7rem;font-weight:700;color:#ddd}.gift-option .gprice{font-size:0.65rem;color:#999}
+        .deposit-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.deposit-card{background:var(--card);border:2px solid var(--border);border-radius:22px;padding:24px;text-align:center;cursor:pointer;transition:0.3s}.deposit-card i{font-size:2.5rem;margin-bottom:8px}.deposit-card h4{font-size:1rem;font-weight:700;margin-bottom:4px}.deposit-card p{font-size:0.75rem;color:var(--text2)}
+        .card-gift{border-color:#e91e63}.card-gift i{color:#e91e63}.card-gift h4{color:#e91e63}.card-stars{border-color:#f0c040}.card-stars i{color:#f0c040}.card-stars h4{color:#f0c040}.card-crypto{border-color:#f39c12}.card-crypto i{color:#f39c12}.card-crypto h4{color:#f39c12}.card-sbp{border-color:#3498db}.card-sbp i{color:#3498db}.card-sbp h4{color:#3498db}
+        .section-label{font-size:1rem;font-weight:700;color:var(--gold);margin:12px 0 6px;text-align:left}
+        .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#0d0720;border:1px solid var(--gold);padding:12px 24px;border-radius:25px;font-weight:700;z-index:999;box-shadow:0 0 25px rgba(240,192,64,0.5);animation:toastAnim 2.5s ease forwards;pointer-events:none}
+        @keyframes toastAnim{0%{opacity:0;top:0}15%{opacity:1;top:20px}80%{opacity:1;top:20px}100%{opacity:0;top:0}}
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="header"><div class="logo"><i class="fas fa-crown"></i><span>STAR GAME</span></div><div class="balance-badge"><i class="fas fa-star"></i><span id="balanceDisplay">1000</span> STARS</div></div>
+        <div class="nav">
+            <div class="nav-btn active" onclick="navigate('games')">ИГРЫ</div>
+            <div class="nav-btn" onclick="navigate('gifts')">ПОДАРКИ</div>
+            <div class="nav-btn" onclick="navigate('deposit')">ПОПОЛНЕНИЕ</div>
+        </div>
+        <div id="page-games" class="page active">
+            <div class="games-grid">
+                <div class="game-card" onclick="openGame('cases')"><i class="fas fa-box-open"></i><div class="name">КЕЙСЫ</div></div>
+                <div class="game-card" onclick="openGame('mines')"><i class="fas fa-bomb"></i><div class="name">МИНЫ</div></div>
+            </div>
+        </div>
+        <div id="page-gifts" class="page"><div style="font-size:1.2rem;font-weight:700;color:var(--gold);margin-bottom:12px;">МОИ ПОДАРКИ</div><div class="gifts-grid" id="myGifts"></div><p style="color:var(--text2);text-align:center;" id="noGifts">Пока нет подарков</p></div>
+        <div id="page-deposit" class="page">
+            <div class="section-label">ПОПОЛНЕНИЕ</div>
+            <div class="deposit-grid">
+                <div class="deposit-card card-gift" onclick="openDeposit('gift')"><i class="fas fa-gift"></i><h4>ПОДАРКОМ</h4><p>Выбери и отправь</p></div>
+                <div class="deposit-card card-stars" onclick="openDeposit('stars')"><i class="fas fa-star"></i><h4>STARS</h4><p>Telegram Stars</p></div>
+                <div class="deposit-card card-crypto" onclick="openDeposit('crypto')"><i class="fab fa-bitcoin"></i><h4>КРИПТА</h4><p>TON, USDT</p></div>
+                <div class="deposit-card card-sbp" onclick="openDeposit('sbp')"><i class="fas fa-credit-card"></i><h4>СБП/КАРТА</h4><p>Быстрый перевод</p></div>
+            </div>
+            <div class="section-label">ВЫВОД</div>
+            <div style="display:flex;gap:14px;">
+                <div class="deposit-card card-gift" onclick="openWithdraw('gift')" style="flex:1;"><i class="fas fa-gift"></i><h4>ПОДАРКОМ</h4></div>
+                <div class="deposit-card card-stars" onclick="openWithdraw('stars')" style="flex:1;"><i class="fas fa-star"></i><h4>ЗВЁЗДАМИ</h4></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="depositModal"><div class="modal-box" id="depositModalBox"></div></div>
+    <div class="modal-overlay" id="sellModal"><div class="modal-box" id="sellModalBox"></div></div>
+    <div class="fullscreen-game" id="fullGame"><div class="game-header"><h3 id="gameTitle"></h3><button class="exit-btn" onclick="closeGame()">ВЫЙТИ</button></div><div class="game-area" id="gameArea"></div></div>
+
+<script>
+    let balance = 1000;
+    let myGifts = [];
+    let currentGame = null;
+    const save = localStorage.getItem('sg_v22');
+    if (save) { try { const s = JSON.parse(save); balance = s.balance || 1000; myGifts = s.gifts || []; } catch (e) {} }
+    function saveState() { localStorage.setItem('sg_v22', JSON.stringify({ balance, gifts: myGifts })); }
+    function updateBalance() { document.getElementById('balanceDisplay').textContent = balance.toLocaleString('ru-RU'); }
+    function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+    function navigate(tab) {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        if (tab === 'games') { document.querySelector('.nav-btn').classList.add('active'); document.getElementById('page-games').classList.add('active'); }
+        else if (tab === 'gifts') { document.querySelectorAll('.nav-btn')[1].classList.add('active'); document.getElementById('page-gifts').classList.add('active'); renderMyGifts(); }
+        else { document.querySelectorAll('.nav-btn')[2].classList.add('active'); document.getElementById('page-deposit').classList.add('active'); }
+    }
+    function addWin(amount) { balance += amount; updateBalance(); saveState(); }
+    function placeBet(amount) { if (amount > balance) { toast('Недостаточно звёзд!'); return false; } balance -= amount; updateBalance(); saveState(); return true; }
+    function closeGame() { document.getElementById('fullGame').classList.remove('active'); currentGame = null; }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    function renderMyGifts() {
+        const grid = document.getElementById('myGifts');
+        const no = document.getElementById('noGifts');
+        if (myGifts.length === 0) { grid.innerHTML = ''; no.style.display = 'block'; return; }
+        no.style.display = 'none';
+        const icons = { bear: 'fa-paw', rose: 'fa-heart', gift: 'fa-gift', heart: 'fa-heart', cake: 'fa-cake', rocket: 'fa-rocket', bouquet: 'fa-leaf' };
+        const names = { bear: 'Мишка', rose: 'Роза', gift: 'Подарок', heart: 'Сердце', cake: 'Торт', rocket: 'Ракета', bouquet: 'Букет' };
+        const prices = { bear: 15, rose: 25, gift: 25, heart: 15, cake: 50, rocket: 50, bouquet: 50 };
+        const cols = { bear: '#8B4513', rose: '#e91e63', gift: '#f0c040', heart: '#e74c3c', cake: '#ff69b4', rocket: '#3498db', bouquet: '#2ecc71' };
+        grid.innerHTML = myGifts.map((g, i) => `
+            <div class="gift-card" onclick="openSellModal(${i})">
+                <i class="fas ${icons[g]||'fa-gift'}" style="color:${cols[g]||'#fff'}"></i>
+                <div class="gname">${names[g]||g}</div>
+                <div class="gprice">${prices[g]||0} STARS</div>
+            </div>`).join('');
+    }
+    function openSellModal(i) {
+        const modal = document.getElementById('sellModal');
+        const box = document.getElementById('sellModalBox');
+        modal.classList.add('open');
+        const g = myGifts[i];
+        const names = { bear: 'Мишка', rose: 'Роза', gift: 'Подарок', heart: 'Сердце', cake: 'Торт', rocket: 'Ракета', bouquet: 'Букет' };
+        const prices = { bear: 15, rose: 25, gift: 25, heart: 15, cake: 50, rocket: 50, bouquet: 50 };
+        const icons = { bear: 'fa-paw', rose: 'fa-heart', gift: 'fa-gift', heart: 'fa-heart', cake: 'fa-cake', rocket: 'fa-rocket', bouquet: 'fa-leaf' };
+        const cols = { bear: '#8B4513', rose: '#e91e63', gift: '#f0c040', heart: '#e74c3c', cake: '#ff69b4', rocket: '#3498db', bouquet: '#2ecc71' };
+        box.innerHTML = `<h3>${names[g]}</h3><i class="fas ${icons[g]}" style="font-size:3rem;color:${cols[g]};margin:10px 0;"></i><p style="color:var(--gold);font-size:1.2rem;">Цена: ${prices[g]} STARS</p><button class="btn btn-play" onclick="sellGift(${i})">ПРОДАТЬ</button><button class="btn btn-close" onclick="closeModal('sellModal')">ОТМЕНА</button>`;
+    }
+    function sellGift(i) { const g = myGifts[i]; const prices = { bear: 15, rose: 25, gift: 25, heart: 15, cake: 50, rocket: 50, bouquet: 50 }; balance += prices[g] || 0; myGifts.splice(i, 1); updateBalance(); saveState(); renderMyGifts(); closeModal('sellModal'); toast('Подарок продан за ' + (prices[g] || 0) + ' STARS!'); }
+
+    function openDeposit(method) {
+        const modal = document.getElementById('depositModal');
+        const box = document.getElementById('depositModalBox');
+        modal.classList.add('open');
+        if (method === 'gift') {
+            box.innerHTML = '<h3>ВЫБЕРИ ПОДАРОК</h3><div class="gift-grid">' +
+                '<div class="gift-option selected" onclick="selGift(this,50)"><div class="gicon"><i class="fas fa-heart"></i></div><div class="gname">Роза</div><div class="gprice">50 STARS</div></div>' +
+                '<div class="gift-option" onclick="selGift(this,100)"><div class="gicon"><i class="fas fa-star"></i></div><div class="gname">Звезда</div><div class="gprice">100 STARS</div></div>' +
+                '<div class="gift-option" onclick="selGift(this,200)"><div class="gicon"><i class="fas fa-gem"></i></div><div class="gname">Бриллиант</div><div class="gprice">200 STARS</div></div>' +
+                '<div class="gift-option" onclick="selGift(this,500)"><div class="gicon"><i class="fas fa-crown"></i></div><div class="gname">Корона</div><div class="gprice">500 STARS</div></div>' +
+                '<div class="gift-option" onclick="selGift(this,1000)"><div class="gicon"><i class="fas fa-trophy"></i></div><div class="gname">Премиум</div><div class="gprice">1000 STARS</div></div>' +
+                '<div class="gift-option" onclick="selGift(this,2500)"><div class="gicon"><i class="fas fa-bolt"></i></div><div class="gname">Коллекционный</div><div class="gprice">2500 STARS</div></div>' +
+                '</div><button class="btn btn-play" onclick="confirmGiftDeposit()">ПЕРЕВЕСТИ ПОДАРОК</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>';
+            window._giftVal = 50;
+        } else {
+            const t = { stars: 'TELEGRAM STARS', crypto: 'КРИПТОВАЛЮТА', sbp: 'СБП / КАРТА' };
+            box.innerHTML = '<h3>' + t[method] + '</h3><input type="number" id="depAmt" value="500" min="15" max="16000"><p style="font-size:0.7rem;color:#888;">Мин: 15 | Макс: 16000</p><button class="btn btn-play" onclick="confirmDep(\'' + method + '\')">ПОПОЛНИТЬ</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>';
+        }
+    }
+    function selGift(el, val) { document.querySelectorAll('.gift-option').forEach(x => x.classList.remove('selected')); el.classList.add('selected'); window._giftVal = val; }
+    function confirmGiftDeposit() { const amt = window._giftVal; document.getElementById('depositModalBox').innerHTML = '<h3>ПЕРЕВЕДИТЕ ПОДАРОК</h3><p style="color:#e91e63;font-size:1rem;">Переведите подарок на данный юзернейм:</p><p style="color:#f0c040;font-size:1.3rem;font-weight:800;">@AdminStarGame</p><p style="color:#aaa;font-size:0.8rem;">Сумма: ' + amt + ' STARS</p><p style="color:#888;font-size:0.7rem;">После перевода нажмите «Готово»</p><button class="btn btn-play" onclick="finalizeGift(' + amt + ')">ГОТОВО</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>'; }
+    function finalizeGift(amt) { toast('Подарок на ' + amt + ' STARS отправлен @AdminStarGame'); closeModal('depositModal'); }
+    function confirmDep(m) { const a = parseInt(document.getElementById('depAmt').value) || 0; if (a < 15) { toast('Минимум 15'); return; } if (a > 16000) { toast('Максимум 16000'); return; } toast('Заявка на ' + a + ' STARS принята!'); closeModal('depositModal'); }
+    function openWithdraw(method) {
+        const modal = document.getElementById('depositModal');
+        const box = document.getElementById('depositModalBox');
+        modal.classList.add('open');
+        if (method === 'gift') {
+            box.innerHTML = '<h3>ВЫБЕРИ ПОДАРОК ДЛЯ ВЫВОДА</h3><div class="gift-grid">' +
+                '<div class="gift-option selected" onclick="selWGift(this,50)"><div class="gicon"><i class="fas fa-heart"></i></div><div class="gname">Роза</div><div class="gprice">50 STARS</div></div>' +
+                '<div class="gift-option" onclick="selWGift(this,100)"><div class="gicon"><i class="fas fa-star"></i></div><div class="gname">Звезда</div><div class="gprice">100 STARS</div></div>' +
+                '<div class="gift-option" onclick="selWGift(this,200)"><div class="gicon"><i class="fas fa-gem"></i></div><div class="gname">Бриллиант</div><div class="gprice">200 STARS</div></div>' +
+                '<div class="gift-option" onclick="selWGift(this,500)"><div class="gicon"><i class="fas fa-crown"></i></div><div class="gname">Корона</div><div class="gprice">500 STARS</div></div>' +
+                '<div class="gift-option" onclick="selWGift(this,1000)"><div class="gicon"><i class="fas fa-trophy"></i></div><div class="gname">Премиум</div><div class="gprice">1000 STARS</div></div>' +
+                '</div><button class="btn btn-play" onclick="goToWithdrawUsername()">ДАЛЕЕ</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>';
+            window._wgiftVal = 50;
+        } else {
+            box.innerHTML = '<h3>ВЫВОД ЗВЁЗДАМИ</h3><p style="font-size:0.7rem;color:#e91e63;">Введите ваш @username:</p><input type="text" id="withUser" value="" placeholder="username" oninput="validateUsername(this)"><p style="font-size:0.7rem;color:#888;margin-top:4px;">Доступно: ' + balance + ' STARS</p><button class="btn btn-play" onclick="confirmWithdrawStars()">ВЫВЕСТИ</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>';
+        }
+    }
+    function selWGift(el, val) { document.querySelectorAll('#depositModalBox .gift-option').forEach(x => x.classList.remove('selected')); el.classList.add('selected'); window._wgiftVal = val; }
+    function goToWithdrawUsername() { const box = document.getElementById('depositModalBox'); box.innerHTML = '<h3>ВЫВОД ПОДАРКОМ</h3><p style="color:#f0c040;">Выбран подарок на ' + window._wgiftVal + ' STARS</p><p style="font-size:0.7rem;color:#e91e63;">Введите ваш @username:</p><input type="text" id="withUser" value="" placeholder="username" oninput="validateUsername(this)"><p style="font-size:0.7rem;color:#888;margin-top:4px;">Доступно: ' + balance + ' STARS</p><button class="btn btn-play" onclick="confirmWithdrawGift()">ВЫВЕСТИ</button><button class="btn btn-close" onclick="closeModal(\'depositModal\')">ОТМЕНА</button>'; }
+    function validateUsername(input) { let val = input.value; val = val.replace(/@/g, ''); const valid = val.replace(/[^a-zA-Z0-9_]/g, ''); if (valid !== val && val.length > 0) { toast('Только латинские буквы, цифры и _'); } input.value = '@' + valid; }
+    function confirmWithdrawGift() { const raw = document.getElementById('withUser').value.trim(); const user = raw.replace(/@/g, ''); if (!user) { toast('Введите @username'); return; } if (!/^[a-zA-Z][a-zA-Z0-9_]{3,31}$/.test(user)) { toast('Некорректный username'); return; } const amt = window._wgiftVal; if (amt > balance) { toast('Недостаточно средств'); return; } balance -= amt; updateBalance(); saveState(); toast('Заявка на вывод подарка для @' + user + ' принята!'); closeModal('depositModal'); }
+    function confirmWithdrawStars() { const raw = document.getElementById('withUser').value.trim(); const user = raw.replace(/@/g, ''); if (!user) { toast('Введите @username'); return; } if (!/^[a-zA-Z][a-zA-Z0-9_]{3,31}$/.test(user)) { toast('Некорректный username'); return; } const amt = Math.min(balance, 500); if (amt < 50) { toast('Минимум 50 STARS'); return; } balance -= amt; updateBalance(); saveState(); toast('Заявка на вывод ' + amt + ' STARS для @' + user + ' принята!'); closeModal('depositModal'); }
+
+function openGame(game) {
+    currentGame = game;
+    document.getElementById('fullGame').classList.add('active');
+    document.getElementById('gameTitle').textContent = game === 'cases' ? 'КЕЙСЫ' : 'МИНЫ';
+    const a = document.getElementById('gameArea');
+    if (game === 'cases') buildCases(a);
+    if (game === 'mines') buildMines(a);
+}
+
+const caseItems = [
+    { type: 'gift', id: 'bear', name: 'Мишка', icon: 'fa-paw', color: '#8B4513', chance: 5 },
+    { type: 'gift', id: 'rose', name: 'Роза', icon: 'fa-heart', color: '#e91e63', chance: 8 },
+    { type: 'gift', id: 'gift', name: 'Подарок', icon: 'fa-gift', color: '#f0c040', chance: 8 },
+    { type: 'gift', id: 'heart', name: 'Сердце', icon: 'fa-heart', color: '#e74c3c', chance: 6 },
+    { type: 'gift', id: 'cake', name: 'Торт', icon: 'fa-cake', color: '#ff69b4', chance: 3 },
+    { type: 'gift', id: 'rocket', name: 'Ракета', icon: 'fa-rocket', color: '#3498db', chance: 3 },
+    { type: 'gift', id: 'bouquet', name: 'Букет', icon: 'fa-leaf', color: '#2ecc71', chance: 3 },
+    { type: 'stars', amount: 5, chance: 30 },
+    { type: 'stars', amount: 10, chance: 22 },
+    { type: 'stars', amount: 15, chance: 12 }
+];
+const totalChance = caseItems.reduce((s, i) => s + i.chance, 0);
+
+function buildCases(a) {
+    // Создаём ленту: 30 слотов (10 оригинальных × 3)
+    const totalSlots = caseItems.length * 3;
+    let slotsHTML = '';
+    for (let i = 0; i < totalSlots; i++) {
+        const item = caseItems[i % caseItems.length];
+        if (item.type === 'gift') {
+            slotsHTML += `<div class="case-slot"><i class="fas ${item.icon}" style="color:${item.color};"></i></div>`;
+        } else {
+            slotsHTML += `<div class="case-slot"><span style="font-size:1rem;font-weight:700;color:var(--gold);">${item.amount}⭐</span></div>`;
+        }
+    }
+    a.innerHTML = `
+        <p style="color:#aaa;">Крути кейс за 15 STARS. Стрелка указывает на выигрыш.</p>
+        <div class="cases-container">
+            <div class="marker"></div>
+            <div class="cases-window">
+                <div class="cases-track" id="casesTrack">${slotsHTML}</div>
+            </div>
+        </div>
+        <div class="result-text" id="caseResult"></div>
+        <button class="btn btn-play" id="caseBtn" onclick="spinCase()">ОТКРЫТЬ КЕЙС (15 STARS)</button>`;
+}
+
+function spinCase() {
+    if (balance < 15) { toast('Недостаточно звёзд! Нужно 15.'); return; }
+    balance -= 15; updateBalance(); saveState();
+    const btn = document.getElementById('caseBtn'); btn.disabled = true; btn.textContent = 'КРУТИМ...';
+    document.getElementById('caseResult').innerHTML = '';
+
+    const r = Math.random() * totalChance;
+    let cum = 0, winner = caseItems[0], winnerIdx = 0;
+    for (let i = 0; i < caseItems.length; i++) { cum += caseItems[i].chance; if (r <= cum) { winner = caseItems[i]; winnerIdx = i; break; } }
+
+    // Позиция победителя в ленте: берём второй повтор (caseItems.length + winnerIdx)
+    const targetSlotIndex = caseItems.length + winnerIdx;
+    const slotWidth = 102;
+    const track = document.getElementById('casesTrack');
+    const startPos = 0;
+    const targetPos = -(targetSlotIndex * slotWidth) + 120;
+    const duration = 5000;
+    const startTime = Date.now();
+
+    function animate() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        track.style.transform = 'translateX(' + (startPos + (targetPos - startPos) * eased) + 'px)';
+        if (progress < 1) requestAnimationFrame(animate);
+        else {
+            if (winner.type === 'gift') { myGifts.push(winner.id); saveState(); document.getElementById('caseResult').innerHTML = `<span style="color:var(--gold);">${winner.name} отправлен в подарки!</span>`; toast('Получен подарок: ' + winner.name + '!'); }
+            else { addWin(winner.amount); document.getElementById('caseResult').innerHTML = `<span style="color:var(--gold);">+${winner.amount} STARS!</span>`; toast('Получено ' + winner.amount + ' STARS!'); }
+            btn.disabled = false; btn.textContent = 'ОТКРЫТЬ КЕЙС (15 STARS)';
+            track.style.transition = 'none'; track.style.transform = 'translateX(0px)';
+            setTimeout(() => { track.style.transition = ''; }, 50);
+        }
+    }
+    track.style.transition = 'none'; track.style.transform = 'translateX(0px)';
+    setTimeout(() => { track.style.transition = 'transform 0.05s linear'; requestAnimationFrame(animate); }, 50);
+}
+
+        let mSt = { act: false, mult: 1, rev: 0, b: [], bet: 100, canCollect: false, bonus: 0 };
+        function buildMines(a) {
+            mSt = { act: true, mult: 1, rev: 0, b: [], bet: 100, canCollect: false, bonus: 0 };
+            while (mSt.b.length < 4) { const r = Math.floor(Math.random() * 16); if (!mSt.b.includes(r)) mSt.b.push(r); }
+            let c = '';
+            for (let i = 0; i < 16; i++) c += `<div class="mine-cell" id="m${i}" onclick="revM(${i})"><i class="fas fa-question" style="color:#f0c040;"></i></div>`;
+            a.innerHTML = `
+                <p style="color:#aaa;">3 клетки = +10% | 6 клеток = +20% | Меньше 3 — без бонуса.</p>
+                <input class="bet-input" id="minesBetInput" value="100" type="number" min="15" max="500" onchange="mSt.bet=Math.max(15,Math.min(500,parseInt(this.value)||100))">
+                <div class="mines-field">${c}</div>
+                <div class="result-text" id="mr">Множитель: x1.0 | Угадано: 0</div>
+                <button class="btn btn-play" id="mcoll" onclick="collM()" style="display:none;">ЗАБРАТЬ</button>`;
+        }
+        function revM(i) {
+            if (!mSt.act) return;
+            const el = document.getElementById('m' + i);
+            if (el.style.background === 'rgb(46, 204, 113)' || el.style.background === 'rgb(231, 76, 60)') return;
+            if (mSt.b.includes(i)) {
+                el.style.background = '#e74c3c'; el.innerHTML = '<i class="fas fa-bomb" style="color:#fff;"></i>';
+                mSt.act = false; mSt.canCollect = false;
+                document.getElementById('mr').innerHTML = `<span style="color:#e74c3c;">БОМБА! Вы проиграли ${mSt.bet} STARS</span>`;
+                document.getElementById('mcoll').style.display = 'none';
+                mSt.b.forEach(b => { const bc = document.getElementById('m' + b); bc.style.background = '#e74c3c'; bc.innerHTML = '<i class="fas fa-bomb" style="color:#fff;"></i>'; });
+                placeBet(mSt.bet);
+                setTimeout(() => { buildMines(document.getElementById('gameArea')); }, 2000);
+            } else {
+                el.style.background = '#2ecc71'; el.innerHTML = '<i class="fas fa-gem" style="color:#fff;"></i>';
+                mSt.rev++;
+                // Бонус только при достижении 3 или 6
+                if (mSt.rev === 3) { mSt.bonus = 0.1; mSt.canCollect = true; }
+                if (mSt.rev === 6) { mSt.bonus = 0.2; mSt.canCollect = true; }
+                mSt.mult = 1 + mSt.bonus;
+                const win = Math.floor(mSt.bet * mSt.mult);
+                const bonusText = mSt.bonus === 0.1 ? ' — БОНУС +10%!' : mSt.bonus === 0.2 ? ' — БОНУС +20%!' : '';
+                document.getElementById('mr').textContent = `Множитель: x${mSt.mult.toFixed(1)} | Угадано: ${mSt.rev}${bonusText}`;
+                if (mSt.canCollect) { document.getElementById('mcoll').style.display = 'inline-block'; document.getElementById('mcoll').textContent = `ЗАБРАТЬ (${win} STARS)`; document.getElementById('mcoll').disabled = false; }
+            }
+        }
+        function collM() { if (!mSt.canCollect || !mSt.act) return; const win = Math.floor(mSt.bet * mSt.mult); addWin(win); mSt.act = false; document.getElementById('mr').innerHTML = `<span style="color:#f0c040;">Забрано! +${win} STARS</span>`; document.getElementById('mcoll').style.display = 'none'; }
+
+        updateBalance();
+        renderMyGifts();
+    </script>
+</body>
+</html>
+
